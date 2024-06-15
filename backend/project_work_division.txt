@@ -1,0 +1,10 @@
+- scraping other sites
+- improving the prompt for extracting more features
+- improving the UI
+- adding options to search by other features (not only the title of the job)
+- optional: let the user upload a cv and offer relevant jobs
+- how should we save the jobs? (currently they are being saved in mongodb
+using the scrape button that triggers the indeed_jobs script)
+- improving search funciotionality. 
+(e.g searching for "data analyst student" should work even though the
+jobs look like: "data analyst - student")
