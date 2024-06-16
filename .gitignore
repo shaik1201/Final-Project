@@ -3,4 +3,4 @@ backend/config.py
 backend/__pycache__/
 
 # Ignore .env in frontend
-frontend/.env
+# frontend/.env
