@@ -10,7 +10,7 @@ import time
 
 def get_indeed_jobs():
     # Skills and Place of Work
-    skill = 'Data Analyst'.strip()
+    skill = 'Data Scientist'.strip()
     place = 'Israel'.strip()
     no_of_pages = 1
 

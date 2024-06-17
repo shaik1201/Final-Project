@@ -30,11 +30,11 @@ class Job:
             "years_of_experience": job_data['years_of_experience'],
             "degree_required": job_data['degree_required']
         }
-        db.jobs.insert_one(job)
+        db.jobs_shai.insert_one(job)
 
     @staticmethod
     def get_all_jobs():
-        jobs = db.jobs.find()
+        jobs = db.jobs_shai.find()
         job_list = [{"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
                     "location": job['location'], "date": job['date'], 
@@ -45,7 +45,7 @@ class Job:
 
     @staticmethod
     def get_job_by_id(job_id):
-        job = db.jobs.find_one({"_id": job_id})
+        job = db.jobs_shai.find_one({"_id": job_id})
         if job:
             return {"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
@@ -57,7 +57,7 @@ class Job:
 
     @staticmethod
     def update_job(job_id, job):
-        db.jobs.update_one(
+        db.jobs_shai.update_one(
             {"_id": job_id},
             {"$set": {"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
@@ -69,4 +69,4 @@ class Job:
 
     @staticmethod
     def delete_job(job_id):
-        db.jobs.delete_one({"_id": job_id})
+        db.jobs_shai.delete_one({"_id": job_id})
