@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import './JobList.css';
+import JobCard from './JobCard';
 
 const JobList = () => {
   const [jobs, setJobs] = useState([]);
   const [user_job_title, set_user_job_title] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 10;
+
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+  
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : 1));
+  };
 
 //   useEffect(() => {
 //     fetch(`${process.env.REACT_APP_BACKEND_URL}/jobs`)
@@ -47,54 +62,36 @@ const JobList = () => {
   };
 
   return (
-    <div>
-      <h1>Job List</h1>
-      <button className="button" onClick={handleScrape}>Scrape Jobs</button>
-      <form>
-      <div className="job-form-container">
-        <input
-          type="text"
-          placeholder="Title"
-          value={user_job_title}
-          onChange={(e) => set_user_job_title(e.target.value)}
-          className="job-input"
-        />
-        <button className="button" type="submit" onClick={handleSubmit}>Search</button>
+    <div className="container">
+      <h1>LLM For Job Searching</h1>
+      <div className="button-container">
+        <button className="button" onClick={handleScrape}>Scrape Jobs</button>
       </div>
+      <form>
+        <div className="job-form-container">
+          <input
+            type="text"
+            placeholder="Title"
+            value={user_job_title}
+            onChange={(e) => set_user_job_title(e.target.value)}
+            className="job-input"
+          />
+          <button className="button" type="submit" onClick={handleSubmit}>Search</button>
+        </div>
       </form>
-
-
-      <table className="job-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Company</th>
-            <th>Location</th>
-            <th>Date</th>
-            <th>Link</th>
-            <th>Years of experience</th>
-            <th>Degree required</th>
-            {/* <th>Description</th> */}
-
-          </tr>
-        </thead>
-        <tbody>
-          {jobs.map((job, index) => (
-            <tr key={index}>
-              <td>{job.title}</td>
-              <td>{job.company}</td>
-              <td>{job.location}</td>
-                <td>{job.date}</td>
-                <td>
-                  <a href={job.link} target="_blank" rel="noopener noreferrer">{job.link}</a>
-                </td>
-                <td>{job.years_of_experience}</td>
-                <td>{job.degree_required}</td>
-                {/* <td>{job.description}</td> */}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="job-cards-container">
+        {currentJobs.map((job, index) => (
+          <JobCard key={index} job={job} />
+        ))}
+      </div>
+      <div className="pagination-container">
+        {currentPage > 1 && (
+          <button className="button" onClick={handlePreviousPage}>Previous</button>
+        )}
+        {indexOfLastJob < jobs.length && (
+          <button className="button" onClick={handleNextPage}>Next</button>
+        )}
+      </div>
     </div>
   );
 };
