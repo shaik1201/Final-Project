@@ -47,6 +47,23 @@ const JobSearch = ({ onSearch }) => {
     onSearch({ title, city, filters });
   };
 
+  const handleClear = () => {
+    setTitle('');
+    setCity('');
+    setFilters({
+      company: '',
+      location: '',
+      datePosted: '',
+      fieldOfExpertise: '',
+      minExperience: '',
+      softSkills: '',
+      techSkills: '',
+      industry: '',
+      scope: '',
+      jobType: '',
+    });
+  };
+
   return (
     <div className="search-container">
       <div className="search-inputs">
@@ -65,6 +82,7 @@ const JobSearch = ({ onSearch }) => {
           className="search-input"
         />
         <button onClick={handleSearch} className="search-button">Search</button>
+        <button onClick={handleClear} className="clear-button">Clear</button>
       </div>
       <div className="filter-dropdowns">
         <select name="company" value={filters.company} onChange={handleInputChange} className="filter-dropdown">
