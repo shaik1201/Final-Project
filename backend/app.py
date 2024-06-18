@@ -2,10 +2,18 @@ from flask import Flask, jsonify, request
 from models import Job
 from flask_cors import CORS
 from jobs_scrapper import get_indeed_jobs
-from gemini_api import get_gemini_response
+from pymongo import MongoClient
+import config
+
+# Example using Flask
 
 app = Flask(__name__)
 CORS(app)
+
+# Database setup
+client = MongoClient(config.MONGO_URI)
+db = client.job_search_db
+
 
 # @app.route('/jobs/scrape', methods=['POST'])
 # def get_jobs_scrape():
@@ -25,6 +33,8 @@ CORS(app)
 #         Job.create_job(job)
 #     return jsonify({"message": "Jobs scraped successfully!"}), 201
 
+
+
 @app.route('/jobs', methods=['GET'])
 def get_jobs():
     job_list = Job.get_all_jobs()
@@ -33,42 +43,36 @@ def get_jobs():
 @app.route('/search', methods=['POST'])
 def search_jobs():
     job_list = Job.get_all_jobs()
-    print(job_list)
-    
     user_job_title = request.get_json()['user_job_title']
-    print(user_job_title)
-    relevant_jobs = []
-
-    for job in job_list:
-        if user_job_title.lower() in job['title'].lower():
-            relevant_jobs.append(job)
-
-
-    print(relevant_jobs)
+    relevant_jobs = [job for job in job_list if user_job_title.lower() in job['title'].lower()]
     return jsonify(relevant_jobs)
 
-# @app.route('/jobs', methods=['POST'])
-def add_job():
-    job_list = Job.get_all_jobs()
-    return jsonify(job_list)
+@app.route('/filters', methods=['GET'])
+def get_filters():
+    filters = get_unique_filter_values()
+    return jsonify(filters)
 
-@app.route('/jobs/<job_id>', methods=['GET'])
-def get_job(job_id):
-    job = Job.get_job_by_id(job_id)
-    if job:
-        return jsonify(job)
-    return jsonify({"message": "Job not found"}), 404
 
-@app.route('/jobs/<job_id>', methods=['PUT'])
-def update_job(job_id):
-    job_data = request.json
-    Job.update_job(job_id, job_data)
-    return jsonify({"message": "Job updated successfully!"})
+# Function to get unique filter values from the database
+def get_unique_filter_values():
+    unique_filters = {
+        "company": db.jobs.distinct("company"),
+        "location": db.jobs.distinct("location"),
+        "datePosted": ["Last 24 hours", "Last 7 days"],  # You might want to dynamically calculate these
+        "fieldOfExpertise": db.jobs.distinct("field_of_expertise"),
+        "minExperience": db.jobs.distinct("minimum_experience"),
+        "softSkills": db.jobs.distinct("soft_skills"),
+        "techSkills": db.jobs.distinct("technical_skills"),
+        "industry": db.jobs.distinct("industry"),
+        "scope": db.jobs.distinct("scope_of_position"),
+        "jobType": db.jobs.distinct("job_type")
+    }
 
-@app.route('/jobs/<job_id>', methods=['DELETE'])
-def delete_job(job_id):
-    Job.delete_job(job_id)
-    return jsonify({"message": "Job deleted successfully!"})
+    return unique_filters
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+

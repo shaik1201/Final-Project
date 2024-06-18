@@ -113,44 +113,6 @@
 //
 // export default JobList;
 
-
-import React, { useEffect, useState } from 'react';
-import './JobList.css';
-import JobCard from './JobCard';
-import Navbar from './Navbar';
-
-const JobList = () => {
-  const [jobs, setJobs] = useState([]);
-  const [user_job_title, set_user_job_title] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const jobsPerPage = 10;
-
-  useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/jobs`)
-      .then(response => response.json())
-      .then(data => setJobs(data))
-      .catch(error => console.error('Error fetching jobs:', error));
-  }, []);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const user_job_title_json = { user_job_title };
-
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/search`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user_job_title_json),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        setJobs(data);
-    })
-    .catch(error => console.error('Error adding job:', error));
-  };
-
   // const handleScrape = async () => {
   //   try {
   //     const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/jobs/scrape`, {
@@ -166,26 +128,123 @@ const JobList = () => {
   //   }
   // };
 
+
+// ---------------------------------------------------
+
+// import React, { useEffect, useState } from 'react';
+// import './JobList.css';
+// import JobCard from './JobCard';
+// import Navbar from './Navbar';
+//
+// const JobList = () => {
+//   const [jobs, setJobs] = useState([]);
+//   const [user_job_title, set_user_job_title] = useState('');
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const jobsPerPage = 10;
+//
+//   useEffect(() => {
+//     fetch(`${process.env.REACT_APP_BACKEND_URL}/jobs`)
+//       .then(response => response.json())
+//       .then(data => setJobs(data))
+//       .catch(error => console.error('Error fetching jobs:', error));
+//   }, []);
+//
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     const user_job_title_json = { user_job_title };
+//
+//     fetch(`${process.env.REACT_APP_BACKEND_URL}/search`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(user_job_title_json),
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log(data);
+//         setJobs(data);
+//     })
+//     .catch(error => console.error('Error adding job:', error));
+//   };
+//
+//   return (
+//     <div>
+//       <Navbar />
+//       <div className="container">
+//         <h1>LLM For Job Searching</h1>
+//         {/* <div className="button-container"> */}
+//         {/*   <button className="button" onClick={handleScrape}>Scrape Jobs</button> */}
+//         {/* </div> */}
+//         <form>
+//           <div className="job-form-container">
+//             <input
+//               type="text"
+//               placeholder="Title"
+//               value={user_job_title}
+//               onChange={(e) => set_user_job_title(e.target.value)}
+//               className="job-input"
+//             />
+//             <button className="button" type="submit" onClick={handleSubmit}>Search</button>
+//           </div>
+//         </form>
+//         <div className="job-cards-container">
+//           {jobs.map((job, index) => (
+//             <JobCard key={index} job={job} />
+//           ))}
+//         </div>
+//         <div className="pagination-container">
+//           {/* Pagination controls if needed */}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+//
+// export default JobList;
+//
+
+// src/JobList.js
+import React, { useEffect, useState } from 'react';
+import './JobList.css';
+import JobCard from './JobCard';
+import Navbar from './Navbar';
+import JobSearch from './JobSearch';
+
+const JobList = () => {
+  const [jobs, setJobs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 10;
+
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/jobs`)
+      .then(response => response.json())
+      .then(data => setJobs(data))
+      .catch(error => console.error('Error fetching jobs:', error));
+  }, []);
+
+  const handleSearch = (searchParams) => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(searchParams),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        setJobs(data);
+    })
+    .catch(error => console.error('Error searching jobs:', error));
+  };
+
   return (
     <div>
       <Navbar />
       <div className="container">
         <h1>LLM For Job Searching</h1>
-        {/* <div className="button-container"> */}
-        {/*   <button className="button" onClick={handleScrape}>Scrape Jobs</button> */}
-        {/* </div> */}
-        <form>
-          <div className="job-form-container">
-            <input
-              type="text"
-              placeholder="Title"
-              value={user_job_title}
-              onChange={(e) => set_user_job_title(e.target.value)}
-              className="job-input"
-            />
-            <button className="button" type="submit" onClick={handleSubmit}>Search</button>
-          </div>
-        </form>
+        <JobSearch onSearch={handleSearch} />
         <div className="job-cards-container">
           {jobs.map((job, index) => (
             <JobCard key={index} job={job} />
@@ -200,5 +259,3 @@ const JobList = () => {
 };
 
 export default JobList;
-
-
