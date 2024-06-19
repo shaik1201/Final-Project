@@ -96,3 +96,4 @@ def get_indeed_jobs():
 if __name__ == "__main__":
     jobs = get_indeed_jobs()
     print(jobs)
+

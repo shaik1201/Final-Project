@@ -5,7 +5,7 @@ client = MongoClient(config.MONGO_URI)
 db = client.job_search_db
 
 class Job:
-    def __init__(self, title, description, job_id, company, location, date, link, years_of_experience, degree_required):
+    def __init__(self, title, description, job_id, company, location, date, link, Education, Field_of_Expertise, Minimum_Experience, Soft_Skills, Technical_Skills, Industry, Scope_of_Position, Job_Type):
         self.title = title
         self.description = description
         self.job_id = job_id
@@ -13,9 +13,14 @@ class Job:
         self.location = location
         self.date = date
         self.link = link
-        self.years_of_experience = years_of_experience
-        self.degree_required = degree_required
-
+        self.education = Education
+        self.field_of_expertise = Field_of_Expertise
+        self.minimum_experience = Minimum_Experience
+        self.soft_skills = Soft_Skills
+        self.technical_skills = Technical_Skills
+        self.industry = Industry
+        self.scope_of_position = Scope_of_Position
+        self.job_type = Job_Type
 
     @staticmethod
     def create_job(job_data):
@@ -27,46 +32,65 @@ class Job:
             "location": job_data['location'],
             "date": job_data['date'],
             "link": job_data['link'],
-            "years_of_experience": job_data['years_of_experience'],
-            "degree_required": job_data['degree_required']
+            "education": job_data['Education'],
+            "field_of_expertise": job_data['Field of Expertise'],
+            "minimum_experience": job_data['Minimum Experience'],
+            "soft_skills": job_data['Soft Skills'],
+            "technical_skills": job_data['Technical Skills'],
+            "industry": job_data['Industry'],
+            "scope_of_position": job_data['Scope of Position'],
+            "job_type": job_data['Job Type']
         }
-        db.jobs_shai.insert_one(job)
+        db.jobs.insert_one(job)
 
     @staticmethod
     def get_all_jobs():
-        jobs = db.jobs_shai.find()
+        jobs = db.jobs.find()
         job_list = [{"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
                     "location": job['location'], "date": job['date'], 
-                    "link": job['link'],
-                    "years_of_experience": job['years_of_experience'],
-                    "degree_required": job['degree_required']} for job in jobs]
+                    "link": job['link'], "education": job['education'],
+                    "field_of_expertise": job['field_of_expertise'],
+                    "minimum_experience": job['minimum_experience'],
+                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    "industry": job['industry'], "scope_of_position": job['scope_of_position'],
+                    "job_type": job['job_type']
+                    } for job in jobs]
         return job_list
 
     @staticmethod
     def get_job_by_id(job_id):
-        job = db.jobs_shai.find_one({"_id": job_id})
+        job = db.jobs.find_one({"_id": job_id})
         if job:
             return {"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
                     "location": job['location'], "date": job['date'], 
-                    "link": job['link'],
-                    "years_of_experience": job['years_of_experience'],
-                    "degree_required": job['degree_required']}
+                    "link": job['link'], "education": job['education'],
+                    "field_of_expertise": job['field_of_expertise'],
+                    "minimum_experience": job['minimum_experience'],
+                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    "industry": job['industry'], "scope_of_position": job['scope_of_position'],
+                    "job_type": job['job_type']
+                    }
         return None
 
     @staticmethod
     def update_job(job_id, job):
-        db.jobs_shai.update_one(
+        db.jobs.update_one(
             {"_id": job_id},
             {"$set": {"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
                     "location": job['location'], "date": job['date'], 
-                    "link": job['link'],
-                    "years_of_experience": job['years_of_experience'],
-                    "degree_required": job['degree_required']}}
+                    "link": job['link'], "education": job['education'],
+                    "field_of_expertise": job['field_of_expertise'],
+                    "minimum_experience": job['minimum_experience'],
+                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    "industry": job['industry'], "scope_of_position": job['scope_of_position'],
+                    "job_type": job['job_type']
+                    }
+             }
         )
 
     @staticmethod
     def delete_job(job_id):
-        db.jobs_shai.delete_one({"_id": job_id})
+        db.jobs.delete_one({"_id": job_id})
