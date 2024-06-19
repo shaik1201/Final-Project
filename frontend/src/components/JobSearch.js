@@ -74,13 +74,13 @@ const JobSearch = ({ onSearch }) => {
           onChange={(e) => setTitle(e.target.value)}
           className="search-input"
         />
-        <input
+        {/* <input
           type="text"
           placeholder="Search by city"
           value={city}
           onChange={(e) => setCity(e.target.value)}
           className="search-input"
-        />
+        /> */}
         <button onClick={handleSearch} className="search-button">Search</button>
         <button onClick={handleClear} className="clear-button">Clear</button>
       </div>
