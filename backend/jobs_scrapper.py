@@ -21,82 +21,7 @@ def close_popup(driver):
         print(f"No pop-up to close or unable to close pop-up: {e}")
 
 
-# def get_indeed_jobs(skill, num_jobs):
-#     # Skills and Place of Work
-#     place = 'Israel'.strip()
-#     no_of_pages = 2
-#
-#     # Initialize Chrome WebDriver
-#     service = Service(ChromeDriverManager().install())
-#     driver = webdriver.Chrome(service=service)
-#
-#     print(f'\nScraping in progress...\n')
-#     job_data = []
-#     # wait = WebDriverWait(driver, 10)
-#
-#     for page in range(no_of_pages):
-#         # if page ==1:
-#         #     x=3
-#         url = f'https://il.indeed.com/jobs?q={skill}&l={place}&start={page}'
-#         driver.get(url)
-#         time.sleep(5)  # Wait for dynamic content to load
-#
-#         # Close any pop-ups if they appear
-#         close_popup(driver)
-#
-#         # Use Selenium to find job cards
-#         job_listings = driver.find_elements(By.CSS_SELECTOR, 'div#mosaic-provider-jobcards ul > li')
-#
-#         for job_listing in job_listings:
-#             try:
-#                 # Extract the job title
-#                 job_title_element = job_listing.find_element(By.CLASS_NAME, "jobTitle")
-#                 # job_title_element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "jobTitle")))
-#                 job_title = job_title_element.text.strip() if job_title_element else "N/A"
-#
-#                 # Extract the company name
-#                 company_element = job_listing.find_element(By.CSS_SELECTOR, 'span[data-testid="company-name"]')
-#                 company = company_element.text.strip() if company_element else "N/A"
-#
-#                 # Extract the location
-#                 location_element = job_listing.find_element(By.CSS_SELECTOR, 'div[data-testid="text-location"]')
-#                 location = location_element.text.strip() if location_element else "N/A"
-#
-#                 # Extract the posted date
-#                 posted_element = job_listing.find_element(By.CSS_SELECTOR, 'span[data-testid="myJobsStateDate"]')
-#                 posted = posted_element.text.strip() if posted_element else "N/A"
-#
-#                 # Extract the job ID and construct the job link
-#                 job_link_element = job_listing.find_element(By.CSS_SELECTOR, "a")
-#                 job_id = job_link_element.get_attribute("id").replace('job_', '') if job_link_element else "N/A"
-#                 job_link = f"https://il.indeed.com/viewjob?jk={job_id}" if job_id != "N/A" else "N/A"
-#
-#                 # Click the job element to get the description
-#                 job_listing.click()
-#
-#                 # Help to load page so we can find and extract data
-#                 time.sleep(random.randint(3, 5))
-#
-#                 # Extract the job description
-#                 job_description = driver.find_element(By.ID, "jobDescriptionText").text if driver.find_element(By.ID, "jobDescriptionText") else "N/A"
-#
-#                 job_data.append({
-#                     "title": job_title,
-#                     "job_id": job_id,
-#                     "company": company,
-#                     "location": location,
-#                     "date": posted,
-#                     "link": job_link,
-#                     "description": job_description
-#                 })
-#
-#             except Exception as e:
-#                 print(f'Error processing job: {e}')
-#     # Close the browser
-#     driver.quit()
-#     return job_data
-
-def get_indeed_jobs(skill, num_jobs):
+def get_indeed_jobs(skill, num_jobs, sort):
     place = 'Israel'.strip()
     total_jobs_scraped = 0
 
@@ -109,7 +34,10 @@ def get_indeed_jobs(skill, num_jobs):
 
     page = 0
     while total_jobs_scraped < num_jobs:
-        url = f'https://il.indeed.com/jobs?q={skill}&l={place}&start={page}'
+        if sort == 'date':
+            url = f'https://il.indeed.com/jobs?q={skill}&l={place}&sort=date&start={page}'
+        else:
+            url = f'https://il.indeed.com/jobs?q={skill}&l={place}&start={page}'
         driver.get(url)
         time.sleep(5)  # Wait for dynamic content to load
 
