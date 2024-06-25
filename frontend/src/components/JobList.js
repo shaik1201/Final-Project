@@ -208,7 +208,6 @@
 import React, { useEffect, useState } from 'react';
 import './JobList.css';
 import JobCard from './JobCard';
-import Navbar from './Navbar';
 import JobSearch from './JobSearch';
 
 const JobList = () => {
@@ -257,8 +256,7 @@ const JobList = () => {
 
   return (
     <div>
-      <Navbar />
-      <div className="container">
+      <div className="">
         <h1>LLM For Job Searching</h1>
         <JobSearch onSearch={handleSearch} />
         <div className="job-cards-container">
@@ -267,17 +265,17 @@ const JobList = () => {
           ))}
         </div>
         <div className="pagination-container">
-          <button 
-            className="button-navigation" 
-            onClick={handlePrevPage} 
+          <button
+            className="button-navigation"
+            onClick={handlePrevPage}
             disabled={currentPage === 1}
           >
             Previous
           </button>
           <span>Page {currentPage} of {Math.ceil(jobs.length / jobsPerPage)}</span>
-          <button 
-            className="button-navigation" 
-            onClick={handleNextPage} 
+          <button
+            className="button-navigation"
+            onClick={handleNextPage}
             disabled={currentPage === Math.ceil(jobs.length / jobsPerPage)}
           >
             Next

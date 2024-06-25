@@ -1,6 +1,7 @@
 // src/JobSearch.js
 import React, { useState, useEffect } from 'react';
 import './JobSearch.css';
+import FilterDropDowns from './FilterDropDowns.js'
 
 const JobSearch = ({ onSearch }) => {
   const [title, setTitle] = useState('');
@@ -31,12 +32,22 @@ const JobSearch = ({ onSearch }) => {
     jobType: []
   });
 
+  const [isCleared, setIsCleared] = useState(false);
+
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/filters`)
       .then(response => response.json())
       .then(data => setFilterOptions(data))
       .catch(error => console.error('Error fetching filter options:', error));
   }, []);
+
+  useEffect(() => {
+    if (isCleared) {
+      onSearch({ title, city, filters });
+      setIsCleared(false); // Reset the cleared state after performing the search
+    }
+  }, [isCleared, title, city, filters, onSearch]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -62,6 +73,7 @@ const JobSearch = ({ onSearch }) => {
       scope: '',
       jobType: '',
     });
+    setIsCleared(true);
   };
 
   return (
@@ -85,66 +97,8 @@ const JobSearch = ({ onSearch }) => {
         <button onClick={handleClear} className="clear-button">Clear</button>
       </div>
       <div className="filter-dropdowns">
-        <select name="company" value={filters.company} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Company</option>
-          {filterOptions.company.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="location" value={filters.location} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Location</option>
-          {filterOptions.location.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="datePosted" value={filters.datePosted} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Date posted</option>
-          {filterOptions.datePosted.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="fieldOfExpertise" value={filters.fieldOfExpertise} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Field of expertise</option>
-          {filterOptions.fieldOfExpertise.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="minExperience" value={filters.minExperience} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Minimum experience</option>
-          {filterOptions.minExperience.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="softSkills" value={filters.softSkills} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Soft skills</option>
-          {filterOptions.softSkills.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="techSkills" value={filters.techSkills} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Technical skills</option>
-          {filterOptions.techSkills.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="industry" value={filters.industry} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Industry</option>
-          {filterOptions.industry.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="scope" value={filters.scope} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Scope of position</option>
-          {filterOptions.scope.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="jobType" value={filters.jobType} onChange={handleInputChange} className="filter-dropdown">
-          <option value="" disabled>Job type</option>
-          {filterOptions.jobType.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
+          <FilterDropDowns filters={filters} filterOptions={filterOptions} handleInputChange={handleInputChange} />
+
       </div>
     </div>
   );
