@@ -3,6 +3,7 @@ import './Navbar.css'
 import { NavLink } from 'react-router-dom';
 import About from './About.js'; // Import About component
 import Contact from './Contact.js'; // Import Contact component
+// Comment
 
 const Navbar = () => {
   return (
