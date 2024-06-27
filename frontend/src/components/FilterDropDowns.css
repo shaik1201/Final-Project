@@ -1,0 +1,19 @@
+/* Styles for the dropdown container */
+.dropdown-container {
+  margin-bottom: 10px; /* Add space between dropdowns */
+  width: 150px;
+}
+
+/* Styles for the label */
+.dropdown-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Styles for the dropdown select */
+.filter-dropdown {
+  width: 75%; /* Adjust the width as needed */
+  height: 40px; /* Adjust the height as needed */
+  padding: 0.540rem;
+  font-size: 1rem;
+}

@@ -43,7 +43,7 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
-  max-width: calc(20% - 10px); /* Ensure max width is set */
+  max-width: 80%; /* Ensure max width is set */
   white-space: nowrap; /* Prevent text from wrapping */
   overflow: hidden; /* Hide overflow text */
   text-overflow: ellipsis; /* Add ellipsis for overflow text */
