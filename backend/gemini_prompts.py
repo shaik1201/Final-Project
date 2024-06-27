@@ -1,6 +1,7 @@
 from copy import deepcopy
 import pandas as pd
 import google.generativeai as genai
+import google.api_core.exceptions
 import json
 import re
 import time
@@ -8,7 +9,6 @@ import google.api_core.exceptions
 import config
 from jobs_scrapper import get_linkedin_jobs, get_indeed_jobs
 from models import Job
-from translator import translateLocation
 
 
 genai.configure(api_key=config.GOOGLE_API_KEY)
@@ -28,6 +28,7 @@ Your response should follow this structure:
 }}
 
 Please ensure the analysis is concise, well-organized, and captures the essence of each section based on the job description provided. The output must be correctly formatted as JSON for easy parsing.
+IMPORTANT: Your response should always be in English, even if the job description is in another language.
 
 Job Description:
 """
@@ -59,7 +60,7 @@ prompts_dict = {
     ),
     "industryPrompt": prompt_template.format(
         feature_key="Industry",
-        feature_description="Specify the principal industry or sector in which the company operates. Your answer should be one or more of the following items: technology, finance, healthcare, education, manufacturing, retail, energy, construction and real estate, transportation and logistics, media and entertainment, government and public sector, hospitality and tourism, agriculture, legal, professional services, other. If the job description does not specify an industry or sector, please state 'other'. Ensure the response is concise and directly lists the relevant industry or sector without additional commentary.",
+        feature_description="Specify the principal industry or sector in which the company operates. Your answer should be one or more of the following items: technology, finance, healthcare, education, manufacturing, retail, energy, construction, real estate, transportation, logistics, media, entertainment, government, public sector, hospitality, tourism, agriculture, legal, professional services, travel, other. If the job description does not specify an industry or sector, please state 'other'. Ensure the response is concise and directly lists the relevant industry or sector without additional commentary.",
         example_output="Technology, Finance"
     ),
     "scopePositionPrompt": prompt_template.format(
@@ -74,7 +75,7 @@ prompts_dict = {
     )
 }
 
-def retry_with_exponential_backoff(func, max_attempts=10, initial_delay=8, backoff_factor=2):
+def retry_with_exponential_backoff(func, max_attempts=10, initial_delay=16, backoff_factor=2):
     delay = initial_delay
     for attempt in range(max_attempts):
         try:
@@ -87,7 +88,7 @@ def retry_with_exponential_backoff(func, max_attempts=10, initial_delay=8, backo
             delay *= backoff_factor
 
 
-def edit_data(job_data, prompts_dict, prompt_template):
+def edit_data(job_data, prompts_dict):
     # iterate over each job description and send it with the prompt to the model for creating new features
     for idx, job in enumerate(job_data):
         print(f"Processing job {idx + 1} / {len(job_data)}...")
@@ -106,18 +107,11 @@ def edit_data(job_data, prompts_dict, prompt_template):
 
                 print(f"Clean Output: {clean_output}")
 
-                # Assuming the model's response is directly in JSON format in the response.text
-                try:
-                    output_dict = json.loads(clean_output)
-                except json.JSONDecodeError as e:
-                    print(f"JSONDecodeError: {e}")
-                    print(f"Failed to decode JSON: {clean_output}")
-                    break
-
                 # # Assuming the model's response is directly in JSON format in the response.text
-                # output_dict = json.loads(clean_output)
+                output_dict = json.loads(clean_output)
                 if not output_dict:
                     break
+
                 feature = list(output_dict.keys())[0]
                 value = output_dict[feature]
 
@@ -148,11 +142,17 @@ def edit_data(job_data, prompts_dict, prompt_template):
                         output_dict[feature] = return_value
                         break
 
-                elif key == "scopePositionPrompt" and isValidScopePosition(value):
-                    break
+                elif key == "scopePositionPrompt":
+                    return_value = isValidScopePosition(value)
+                    if return_value:
+                        output_dict[feature] = return_value
+                        break
 
-                elif key == "jobTypePrompt" and isValidJobType(value):
-                    break
+                elif key == "jobTypePrompt":
+                    return_value = isValidJobType(value)
+                    if return_value:
+                        output_dict[feature] = return_value
+                        break
 
             job_dict.update(output_dict)
 
@@ -161,9 +161,6 @@ def edit_data(job_data, prompts_dict, prompt_template):
 
     return job_data
 
-
-def output_start_swith_json(input_str):
-    return input_str.startswith("```json") or input_str.startswith("```JSON")
 
 
 def isValidEducation(value):
@@ -224,14 +221,20 @@ def isValidIndustry(value):
         "manufacturing",
         "retail",
         "energy",
-        "construction and real estate",
-        "transportation and logistics",
-        "media and entertainment",
-        "government and public sector",
-        "hospitality and tourism",
+        "construction",
+        "real estate",
+        "transportation",
+        "logistics",
+        "media",
+        "entertainment",
+        "government",
+        "public sector",
+        "hospitality",
+        "tourism",
         "agriculture",
         "legal",
         "professional services",
+        "travel",
         "other"
     ]
 
@@ -249,43 +252,58 @@ def isValidIndustry(value):
             return False
 
     # Join the normalized fields back into a comma-separated string
-    return ", ".join(industry_fields)
+    industry_fields = ", ".join(industry_fields)
+    return industry_fields.title()
 
 
 def isValidScopePosition(value):
     value = value.lower()
     if value in ["full-time", "part-time", "contract", "temporary", "freelance", "internship", "casual"]:
-        return True
+        return value.title()
     return False
 
 
 def isValidJobType(value):
     value = value.lower()
     if value in ["in-office", "hybrid", "remote"]:
-        return True
+        return value.title()
     return False
 
 
 
 if __name__ == '__main__':
     skill = 'Data Analyst'.strip()
-    num_jobs = 15
+    num_jobs = 7
     sort = 'date'
+
     # Scrape the jobs from Indeed
-    scrapped_jobs_dict = get_indeed_jobs(skill, num_jobs, sort)
-
-    # Edit the scrapped jobs data and add the new features
-    indeed_jobs = edit_data(scrapped_jobs_dict, prompts_dict, prompt_template)
-    indeed_jobs_english_locations = translateLocation(indeed_jobs)
-
-    df_indeed = pd.DataFrame(indeed_jobs)
-    # df_linkedin = pd.DataFrame(jobs_linkedin)
-
-    df_indeed.to_csv('Jobs_Indeed.csv', index=False)
+    # scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs, sort)
+    # scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs, sort)
+    #
+    # df_indeed = pd.DataFrame(scrapped_indeed_jobs_dict)
+    # df_linkedin = pd.DataFrame(scrapped_linkedin_jobs_dict)
+    #
+    # df_indeed.to_csv('Jobs_Indeed.csv', index=False)
     # df_linkedin.to_csv('Jobs_LinkedIn.csv', index=False)
 
-    # # Store the jobs into the database MongoDB
+    scrapped_indeed_jobs_dict = pd.read_csv('Jobs_Indeed.csv').to_dict('records')
+    scrapped_linkedin_jobs_dict = pd.read_csv('Jobs_LinkedIn.csv').to_dict('records')
+
+    # Edit the scrapped jobs data and add the new features
+    indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
+    linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
+
+    df_indeed_update = pd.DataFrame(indeed_jobs)
+    df_linkedin_update = pd.DataFrame(linkedin_jobs)
+
+    # Save the jobs data to CSV files
+    df_indeed_update.to_csv('Jobs_Indeed_update.csv', index=False)
+    df_linkedin_update.to_csv('Jobs_LinkedIn_update.csv', index=False)
+
+    # # # Store the jobs into the database MongoDB
+    # for job in indeed_jobs_english_locations:
+    #     Job.create_job(job)
+    #
     # for job in indeed_jobs_english_locations:
     #     Job.create_job(job)
     # print("Jobs scraped successfully!")
-
