@@ -1,0 +1,65 @@
+using only gunicorn:
+gunicorn --bind 0.0.0.0:8000 app:app
+
+using nginx:
+sudo nano /etc/nginx/sites-available/myflaskapp
+server {
+    listen 80;
+    server_name localhost; # Change this to your domain name or IP address
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+sudo ln -s /etc/nginx/sites-available/myflaskapp /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
+sudo nginx -t
+ sudo service nginx restart
+gunicorn --bind 127.0.0.1:8000 app:app
+go to localhost with no port number
+
+when using react, a magic command:
+sudo chmod o+rx /home/shaik/
+gunicorn -b :5000 api:app OR /root/Final-Project/venv/bin/gunicorn -b :5000 app:app
+
+
+the process on digital ocean:
+on backend:
+- change route to /api/<endpoint>
+on frontend:
+- change in the .env to 46.101.131.126 instead of localhost:5000
+- change in each fetch to the route /api/<endpoint>
+- npm run build
+
+- sudo rm /etc/nginx/sites-enabled/default
+- sudo nano /etc/nginx/sites-available/final-project.nginx
+- inside the above file:
+server {
+    listen 80;
+    server_name server_name llm-for-job-searching.crabdance.com; # or the ip address
+
+    root /var/www/Final-Project/frontend/build;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+- sudo ln -s /etc/nginx/sites-available/final-project.nginx /etc/nginx/sites-enabled/final-project.nginx
+- sudo service nginx reload
+- /var/www/Final-Project/new-env/bin/gunicorn -b :5000 app:app

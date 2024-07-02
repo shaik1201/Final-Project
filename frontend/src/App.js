@@ -1,13 +1,26 @@
 import React from 'react';
-import './App.css';
-import JobList from './components/JobList';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './components/Home';
+import About from './components/About';
+import Services from './components/Services';
+import Contact from './components/Contact';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <JobList />
-    </div>
+    <Router>
+      <div className='App'>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
+

@@ -1,8 +1,12 @@
 from pymongo import MongoClient
 import config
 
-client = MongoClient(config.MONGO_URI)
-db = client.job_search_db
+try:
+    client = MongoClient(config.MONGO_URI)
+    db = client.job_search_db
+    print("Connection to MongoDB successful")
+except Exception as e:
+    print(f"Failed to connect to MongoDB: {e}")
 
 class Job:
     def __init__(self, title, description, job_id, company, location, date, link, Education, Field_of_Expertise, Minimum_Experience, Soft_Skills, Technical_Skills, Industry, Scope_of_Position, Job_Type):

@@ -6,6 +6,10 @@ from pymongo import MongoClient
 import config
 import re
 from deep_translator import GoogleTranslator
+import os
+from read_pdf import extract_text
+from gemini_for_CV import get_gemini_response
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -13,6 +17,31 @@ CORS(app)
 # Database setup
 client = MongoClient(config.MONGO_URI)
 db = client.job_search_db
+
+# UPLOAD_FOLDER = 'uploads'  # Directory to save the uploaded files
+# if not os.path.exists(UPLOAD_FOLDER):
+#     os.makedirs(UPLOAD_FOLDER)
+
+@app.route('/upload_cv', methods=['POST'])
+def upload_cv():
+    if 'cv' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files['cv']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    if file:
+        text = extract_text(file)
+        if text:
+            # print(text)
+            features = get_gemini_response(text)
+            # print(json.loads(features))
+        
+        
+        return jsonify({"message": "File uploaded successfully"}), 200
+
+    return jsonify({"error": "File upload failed"}), 500
 
 
 # @app.route('/jobs/scrape', methods=['POST'])
