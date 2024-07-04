@@ -164,3 +164,11 @@ h1 {
 .job-link:hover {
   text-decoration: underline;
 }
+
+
+.break-sent {
+  justify-content: center;
+  display: flex;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}

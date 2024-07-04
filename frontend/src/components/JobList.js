@@ -3,6 +3,7 @@ import './JobList.css';
 import JobCard from './JobCard';
 import Navbar from './Navbar';
 import JobSearch from './JobSearch';
+import UploadCV from './UploadCV';
 
 const JobList = () => {
   const [jobs, setJobs] = useState([]);
@@ -66,6 +67,7 @@ const JobList = () => {
 
         const result = await response.json();
         console.log('CV uploaded successfully:', result);
+        setJobs(result);
       } catch (error) {
         console.error('Error uploading CV:', error);
       }
@@ -81,9 +83,10 @@ const JobList = () => {
   return (
     <div>
       <div className="container">
-        <h1>LLM For Job Searching</h1>
-        <input type="file" accept="application/pdf" onChange={handleFileChange} />
-        <button onClick={uploadCV}>Upload CV</button>
+        <UploadCV onUpload={uploadCV} onFileChange={handleFileChange}/>
+        <div className='break-sent'>
+          <h2>Or, search manually</h2>
+        </div>
 
         <JobSearch onSearch={handleSearch} />
         <div className="job-cards-container">

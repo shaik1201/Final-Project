@@ -35,46 +35,40 @@ def upload_cv():
         text = extract_text(file)
         if text:
             # print(text)
-            features = get_gemini_response(text)
-            # print(json.loads(features))
-        
-        
+            features = json.loads(get_gemini_response(text))
+            print(features)
+            years_of_experience = features['years_of_experience']
+            soft_skills = features['soft_skills']
+            technical_skills = features['technical_skills']
+            field_of_expertise = features['field_of_expertise']
+            is_student = features['is_student']
+            job_list = Job.get_all_jobs()
+            relevant_jobs = []
+            for job in job_list:
+                if years_of_experience and int(years_of_experience) < int(job['minimum_experience'][0]):
+                    continue
+                # if soft_skills and not any(skill in job['soft_skills'] for skill in soft_skills):
+                #     continue
+                # if technical_skills and not any(skill in job['technical_skills'] for skill in technical_skills):
+                #     continue
+                # if field_of_expertise and field_of_expertise not in job['field_of_expertise']:
+                #     continue
+                if (is_student == False and job['scope_of_position'] == 'Part-time')\
+                    or (is_student == True and job['scope_of_position'] == 'Full-time'):
+                    continue
+                relevant_jobs.append(job)
+            return jsonify(relevant_jobs)
+            
+            
         return jsonify({"message": "File uploaded successfully"}), 200
 
     return jsonify({"error": "File upload failed"}), 500
-
-
-# @app.route('/jobs/scrape', methods=['POST'])
-# def get_jobs_scrape():
-#     indeed_jobs = get_indeed_jobs()
-#     for job in indeed_jobs:
-#         # print(get_gemini_response(job['description']))
-#         try:
-#             job['years_of_experience'] = get_gemini_response(job['description'])['years_of_experience']
-#             job['degree_required'] = get_gemini_response(job['description'])['degree_required']
-#         except:
-#             job['years_of_experience'] = None
-#             job['degree_required'] = None
-#
-#     print(indeed_jobs)
-#
-#     for job in indeed_jobs:
-#         Job.create_job(job)
-#     return jsonify({"message": "Jobs scraped successfully!"}), 201
-
 
 
 @app.route('/jobs', methods=['GET'])
 def get_jobs():
     job_list = Job.get_all_jobs()
     return jsonify(job_list)
-
-# @app.route('/search', methods=['POST'])
-# def search_jobs():
-#     job_list = Job.get_all_jobs()
-#     user_job_title = request.get_json()['user_job_title']
-#     relevant_jobs = [job for job in job_list if user_job_title.lower() in job['title'].lower()]
-#     return jsonify(relevant_jobs)
 
 
 @app.route('/search', methods=['POST'])

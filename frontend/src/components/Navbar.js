@@ -6,6 +6,8 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
+      <h1>LLM For Job Searching</h1>
+
         <ul className="nav-menu">
           <li className="nav-item">
             <Link to="/" className="nav-links">
