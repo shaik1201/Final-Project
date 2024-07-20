@@ -1,6 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css'
+import { NavLink } from 'react-router-dom';
+import About from './About.js'; // Import About component
+import Contact from './Contact.js'; // Import Contact component
+// Comment
 
 const Navbar = () => {
   return (
@@ -10,24 +14,19 @@ const Navbar = () => {
 
         <ul className="nav-menu">
           <li className="nav-item">
-            <Link to="/" className="nav-links">
+            <NavLink exact to="/" className="nav-links" activeClassName="active-link">
               Home
-            </Link>
+            </NavLink>
           </li>
           <li className="nav-item">
-            <Link to="/about" className="nav-links">
+            <NavLink to="/about" className="nav-links" activeClassName="active-link">
               About
-            </Link>
+             </NavLink>
           </li>
           <li className="nav-item">
-            <Link to="/services" className="nav-links">
-              Services
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/contact" className="nav-links">
+            <NavLink to="/contact" className="nav-links" activeClassName="active-link">
               Contact
-            </Link>
+            </NavLink>
           </li>
           {/* Add more <li> elements for additional navigation items */}
         </ul>
