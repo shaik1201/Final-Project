@@ -14,7 +14,14 @@ const JobList = () => {
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/jobs`)
       .then(response => response.json())
-      .then(data => setJobs(data))
+      .then(data => {
+        console.log('Fetched jobs:', data); // Log the fetched data
+        if (Array.isArray(data)) {
+          setJobs(data);
+        } else {
+          console.error('Fetched data is not an array:', data);
+        }
+      })
       .catch(error => console.error('Error fetching jobs:', error));
   }, []);
 
@@ -28,8 +35,12 @@ const JobList = () => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
-        setJobs(data);
+        console.log('Search results:', data); // Log the search results
+        if (Array.isArray(data)) {
+          setJobs(data);
+        } else {
+          console.error('Search results are not an array:', data);
+        }
     })
     .catch(error => console.error('Error searching jobs:', error));
   };
@@ -67,7 +78,11 @@ const JobList = () => {
 
         const result = await response.json();
         console.log('CV uploaded successfully:', result);
-        setJobs(result);
+        if (Array.isArray(result)) {
+          setJobs(result);
+        } else {
+          console.error('Uploaded CV response is not an array:', result);
+        }
       } catch (error) {
         console.error('Error uploading CV:', error);
       }

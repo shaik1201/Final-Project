@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
 from models import Job
 from flask_cors import CORS
-from jobs_scrapper import get_indeed_jobs
+# from jobs_scrapper import get_indeed_jobs
 from pymongo import MongoClient
 import config
 import re
-from deep_translator import GoogleTranslator
+# from deep_translator import GoogleTranslator
 import os
 from read_pdf import extract_text
 from gemini_for_CV import get_gemini_response
