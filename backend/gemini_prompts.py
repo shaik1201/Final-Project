@@ -7,6 +7,7 @@ import re
 import time
 import google.api_core.exceptions
 import config
+import os
 from jobs_scrapper import get_linkedin_jobs, get_indeed_jobs
 from models import Job
 
@@ -32,6 +33,7 @@ IMPORTANT: Your response should always be in English, even if the job descriptio
 
 Job Description:
 """
+
 prompts_dict = {
     "educationPrompt": prompt_template.format(
         feature_key="Education",
@@ -48,11 +50,11 @@ prompts_dict = {
         feature_description="Specify the required years of experience for the job in the format '{x years}'. If the job description states a range of experience (e.g., 'between x-y years'), use the minimum value in the range. If no specific years of experience are mentioned, please state '0 years'. Ensure the response is concise and directly lists the relevant experience without additional commentary.",
         example_output="3 years"
     ),
-    "softSkillsPrompt": prompt_template.format(
-        feature_key="Soft Skills",
-        feature_description="Specify the required personality traits and soft skills for the job. If the job description does not mention any specific traits, please state 'None'. Ensure the response is concise and directly lists the relevant traits without additional commentary.",
-        example_output="Communication, Teamwork"
-    ),
+    # "softSkillsPrompt": prompt_template.format(
+    #     feature_key="Soft Skills",
+    #     feature_description="Specify the required personality traits and soft skills for the job. If the job description does not mention any specific traits, please state 'None'. Ensure the response is concise and directly lists the relevant traits without additional commentary.",
+    #     example_output="Communication, Teamwork"
+    # ),
     "technicalSkillsPrompt": prompt_template.format(
         feature_key="Technical Skills",
         feature_description="Specify the required programming languages, tools, platforms, and other technical skills relevant to the job. If no specific technical skills are mentioned in the job description, please state 'None'. Ensure the response is concise and directly lists the relevant skills without additional commentary.",
@@ -130,8 +132,8 @@ def edit_data(job_data, prompts_dict):
                 elif key == "experiencePrompt" and isValidExperience(value):
                     break
 
-                elif key == "softSkillsPrompt":
-                    break
+                # elif key == "softSkillsPrompt":
+                #     break
 
                 elif key == "technicalSkillsPrompt":
                     break
@@ -276,34 +278,41 @@ if __name__ == '__main__':
     num_jobs = 7
     sort = 'date'
 
-    # Scrape the jobs from Indeed
-    # scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs, sort)
-    # scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs, sort)
-    #
-    # df_indeed = pd.DataFrame(scrapped_indeed_jobs_dict)
-    # df_linkedin = pd.DataFrame(scrapped_linkedin_jobs_dict)
-    #
-    # df_indeed.to_csv('Jobs_Indeed.csv', index=False)
-    # df_linkedin.to_csv('Jobs_LinkedIn.csv', index=False)
+    # Create the 'jobs' folder if it doesn't exist
+    os.makedirs('jobs', exist_ok=True)
 
-    scrapped_indeed_jobs_dict = pd.read_csv('Jobs_Indeed.csv').to_dict('records')
-    scrapped_linkedin_jobs_dict = pd.read_csv('Jobs_LinkedIn.csv').to_dict('records')
+    # Scrape the jobs from Indeed
+    scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs, sort)
+    scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs, sort)
+
+    # Convert the scraped data to DataFrame
+    df_indeed = pd.DataFrame(scrapped_indeed_jobs_dict)
+    df_linkedin = pd.DataFrame(scrapped_linkedin_jobs_dict)
+
+    # Save the DataFrames to CSV files in the 'jobs' folder
+    df_indeed.to_csv('jobs/Jobs_Indeed.csv', index=False)
+    df_linkedin.to_csv('jobs/Jobs_LinkedIn.csv', index=False)
+
+    # Read the CSV files back into dictionaries
+    scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed.csv').to_dict('records')
+    scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn.csv').to_dict('records')
 
     # Edit the scrapped jobs data and add the new features
     indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
     linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
 
+    # Convert the updated job data to DataFrames
     df_indeed_update = pd.DataFrame(indeed_jobs)
     df_linkedin_update = pd.DataFrame(linkedin_jobs)
 
-    # Save the jobs data to CSV files
-    df_indeed_update.to_csv('Jobs_Indeed_update.csv', index=False)
-    df_linkedin_update.to_csv('Jobs_LinkedIn_update.csv', index=False)
+    # Save the updated DataFrames to CSV files in the 'jobs' folder
+    df_indeed_update.to_csv('jobs/Jobs_Indeed_update.csv', index=False)
+    df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_update.csv', index=False)
 
-    # # # Store the jobs into the database MongoDB
-    # for job in indeed_jobs_english_locations:
-    #     Job.create_job(job)
-    #
-    # for job in indeed_jobs_english_locations:
-    #     Job.create_job(job)
-    # print("Jobs scraped successfully!")
+    # Store the jobs into the database MongoDB
+    for job in indeed_jobs:
+        Job.create_job(job)
+
+    for job in linkedin_jobs:
+        Job.create_job(job)
+    print("Jobs scraped successfully!")

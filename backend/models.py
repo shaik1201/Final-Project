@@ -39,7 +39,7 @@ class Job:
             "education": job_data['Education'],
             "field_of_expertise": job_data['Field of Expertise'],
             "minimum_experience": job_data['Minimum Experience'],
-            "soft_skills": job_data['Soft Skills'],
+            # "soft_skills": job_data['Soft Skills'],
             "technical_skills": job_data['Technical Skills'],
             "industry": job_data['Industry'],
             "scope_of_position": job_data['Scope of Position'],
@@ -47,16 +47,18 @@ class Job:
         }
         db.jobs.insert_one(job)
 
+
     @staticmethod
     def get_all_jobs():
         jobs = db.jobs.find()
         job_list = [{"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
-                    "location": job['location'], "date": job['date'], 
+                    "location": job['location'], "date": job['date'],
                     "link": job['link'], "education": job['education'],
                     "field_of_expertise": job['field_of_expertise'],
                     "minimum_experience": job['minimum_experience'],
-                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    # "soft_skills": job['soft_skills'],
+                     "technical_skills": job['technical_skills'],
                     "industry": job['industry'], "scope_of_position": job['scope_of_position'],
                     "job_type": job['job_type']
                     } for job in jobs]
@@ -68,11 +70,12 @@ class Job:
         if job:
             return {"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
-                    "location": job['location'], "date": job['date'], 
+                    "location": job['location'], "date": job['date'],
                     "link": job['link'], "education": job['education'],
                     "field_of_expertise": job['field_of_expertise'],
                     "minimum_experience": job['minimum_experience'],
-                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    # "soft_skills": job['soft_skills'],
+                    "technical_skills": job['technical_skills'],
                     "industry": job['industry'], "scope_of_position": job['scope_of_position'],
                     "job_type": job['job_type']
                     }
@@ -84,11 +87,12 @@ class Job:
             {"_id": job_id},
             {"$set": {"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
-                    "location": job['location'], "date": job['date'], 
+                    "location": job['location'], "date": job['date'],
                     "link": job['link'], "education": job['education'],
                     "field_of_expertise": job['field_of_expertise'],
                     "minimum_experience": job['minimum_experience'],
-                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    # "soft_skills": job['soft_skills'],
+                      "technical_skills": job['technical_skills'],
                     "industry": job['industry'], "scope_of_position": job['scope_of_position'],
                     "job_type": job['job_type']
                     }
@@ -98,3 +102,4 @@ class Job:
     @staticmethod
     def delete_job(job_id):
         db.jobs.delete_one({"_id": job_id})
+
