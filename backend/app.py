@@ -14,9 +14,12 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-# Database setup
-client = MongoClient(config.MONGO_URI)
-db = client.job_search_db
+try:
+    client = MongoClient(config.MONGO_URI)
+    db = client.job_search_db
+    print("Connection to MongoDB successful")
+except Exception as e:
+    print(f"Failed to connect to MongoDB: {e}")
 
 # UPLOAD_FOLDER = 'uploads'  # Directory to save the uploaded files
 # if not os.path.exists(UPLOAD_FOLDER):

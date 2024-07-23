@@ -8,23 +8,33 @@ const JobList = () => {
   const [jobs, setJobs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [cvFile, setCvFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const jobsPerPage = 9;
 
   useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = () => {
+    setIsLoading(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/jobs`)
       .then(response => response.json())
       .then(data => {
-        console.log('Fetched jobs:', data); // Log the fetched data
         if (Array.isArray(data)) {
           setJobs(data);
         } else {
           console.error('Fetched data is not an array:', data);
         }
+        setIsLoading(false);
       })
-      .catch(error => console.error('Error fetching jobs:', error));
-  }, []);
+      .catch(error => {
+        console.error('Error fetching jobs:', error);
+        setIsLoading(false);
+      });
+  };
 
   const handleSearch = (searchParams) => {
+    setIsLoading(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/search`, {
       method: 'POST',
       headers: {
@@ -34,14 +44,17 @@ const JobList = () => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Search results:', data); // Log the search results
-        if (Array.isArray(data)) {
-          setJobs(data);
-        } else {
-          console.error('Search results are not an array:', data);
-        }
+      if (Array.isArray(data)) {
+        setJobs(data);
+      } else {
+        console.error('Search results are not an array:', data);
+      }
+      setIsLoading(false);
     })
-    .catch(error => console.error('Error searching jobs:', error));
+    .catch(error => {
+      console.error('Error searching jobs:', error);
+      setIsLoading(false);
+    });
   };
 
   const handleNextPage = () => {
@@ -62,6 +75,7 @@ const JobList = () => {
 
   const uploadCV = async () => {
     if (cvFile) {
+      setIsLoading(true);
       const formData = new FormData();
       formData.append('cv', cvFile);
 
@@ -76,7 +90,6 @@ const JobList = () => {
         }
 
         const result = await response.json();
-        console.log('CV uploaded successfully:', result);
         if (Array.isArray(result)) {
           setJobs(result);
         } else {
@@ -84,6 +97,8 @@ const JobList = () => {
         }
       } catch (error) {
         console.error('Error uploading CV:', error);
+      } finally {
+        setIsLoading(false);
       }
     } else {
       alert('Please select a file to upload.');
@@ -95,36 +110,46 @@ const JobList = () => {
   const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
 
   return (
-    <div>
+    <div className="job-list">
       <div className="container">
-        <UploadCV onUpload={uploadCV} onFileChange={handleFileChange}/>
-        <div className='break-sent'>
-          <h2>Or, search manually</h2>
+        <h1 className="main-title">Find Your Dream Job</h1>
+        <div className="upload-section">
+          <UploadCV onUpload={uploadCV} onFileChange={handleFileChange} />
+          <div className="divider">
+            <span>OR</span>
+          </div>
         </div>
-
         <JobSearch onSearch={handleSearch} />
-        <div className="job-cards-container">
-          {currentJobs.map((job, index) => (
-            <JobCard key={index} job={job} />
-          ))}
-        </div>
-        <div className="pagination-container">
-          <button
-            className="button-navigation"
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span>Page {currentPage} of {Math.ceil(jobs.length / jobsPerPage)}</span>
-          <button
-            className="button-navigation"
-            onClick={handleNextPage}
-            disabled={currentPage === Math.ceil(jobs.length / jobsPerPage)}
-          >
-            Next
-          </button>
-        </div>
+        {isLoading ? (
+          <div className="loading-spinner">Loading...</div>
+        ) : (
+          <>
+            <div className="job-cards-container">
+              {currentJobs.map((job, index) => (
+                <JobCard key={index} job={job} />
+              ))}
+            </div>
+            <div className="pagination-container">
+              <button
+                className="button-navigation"
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span className="pagination-info">
+                Page {currentPage} of {Math.ceil(jobs.length / jobsPerPage)}
+              </span>
+              <button
+                className="button-navigation"
+                onClick={handleNextPage}
+                disabled={currentPage === Math.ceil(jobs.length / jobsPerPage)}
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
