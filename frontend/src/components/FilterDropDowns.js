@@ -1,22 +1,10 @@
 import React from 'react';
-//import MultiSelectDropdown from './MultiSelectDropdown';
+import MultiSelectDropdown from './MultiSelectDropdown';
 import './FilterDropDowns.css'
 
-const Dropdown = ({ name, value, onChange, options, placeholder, title }) => (
-  <div className="dropdown-container">
-    <label htmlFor={name}>{title}</label>
-    <select id={name} name={name} value={value} onChange={onChange} className="filter-dropdown">
-      <option value="" disabled>{placeholder}</option>
-      {options.map(option => (
-        <option key={option} value={option}>{option}</option>
-      ))}
-    </select>
-  </div>
-);
-
-const FilterDropdowns = ({ filters, filterOptions, handleInputChange }) => {
+const FilterDropDowns = ({ filters, filterOptions, handleInputChange }) => {
   const dropdownConfigs = [
-     { name: "company", placeholder: "Company", title: "Company" },
+    { name: "company", placeholder: "Company", title: "Company" },
     { name: "location", placeholder: "Location", title: "Location" },
     { name: "datePosted", placeholder: "Date posted", title: "Date posted" },
     { name: "fieldOfExpertise", placeholder: "Field of expertise", title: "Field of expertise" },
@@ -28,41 +16,39 @@ const FilterDropdowns = ({ filters, filterOptions, handleInputChange }) => {
     { name: "jobType", placeholder: "Job type", title: "Job type" }
   ];
 
-// const handleMultiSelectChange = (name, selectedValues) => {
-//    handleInputChange({ target: { name, value: selectedValues } });
-//  };
+  const handleMultiSelectChange = (name, selectedValues) => {
+    console.log(`selectedValues under handleMultiSelectChange inside FilterDropDowns:`, selectedValues)
+    handleInputChange({ target: { name, value: selectedValues } });
+  };
 
-//  return (
-//    <div className="dropdown-container">
-//      {dropdownConfigs.map(config => (
-//        <MultiSelectDropdown
-//          key={config.name}
-//          name={config.name}
-//          selectedValues={filters[config.name]}
-//          onChange={handleMultiSelectChange}
-//          options={filterOptions[config.name]}
-//          placeholder={"All"}
-//          title={config.title}
-//        />
-//      ))}
-//    </div>
-//  );
-  return (
-    <>
-      {dropdownConfigs.map(config => (
-        <Dropdown
+const selectedValues = {};
+Object.keys(filterOptions).forEach(key => {
+    selectedValues[key] = [];
+});
+
+console.log(`filterOptions under FilterDropDowns:`, filterOptions);
+console.log(`~~~~ filters under FilterDropDowns:`, filters);
+
+return (
+  <div className="dropdown-container">
+    {dropdownConfigs.map(config => {
+      console.log(`filterOptions of ${config.name} under FilterDropDowns:`, filterOptions[config.name]);
+      console.log(`filters of ${config.name} under FilterDropDowns:`, filters[config.name]);
+
+      return (
+        <MultiSelectDropdown
           key={config.name}
           name={config.name}
-          value={filters[config.name]}
-          onChange={handleInputChange}
+          selectedValues={filters[config.name] || []}
+          onChange={handleMultiSelectChange}
           options={filterOptions[config.name]}
-          placeholder={"All"}
+          placeholder="All"
           title={config.title}
         />
-      ))}
-    </>
-  );
+      );
+    })}
+  </div>
+);
 };
 
-
-export default FilterDropdowns;
+export default FilterDropDowns;

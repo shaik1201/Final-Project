@@ -1,22 +1,20 @@
-// src/JobSearch.js
 import React, { useState, useEffect } from 'react';
 import './JobSearch.css';
-import FilterDropDowns from './FilterDropDowns.js'
+import FilterDropDowns from './FilterDropDowns';
 
 const JobSearch = ({ onSearch }) => {
   const [title, setTitle] = useState('');
-  const [city, setCity] = useState('');
   const [filters, setFilters] = useState({
-    company: '',
-    location: '',
-    datePosted: '',
-    fieldOfExpertise: '',
-    minExperience: '',
-    softSkills: '',
-    techSkills: '',
-    industry: '',
-    scope: '',
-    jobType: '',
+    company: [],
+    location: [],
+    datePosted: [],
+    fieldOfExpertise: [],
+    minExperience: [],
+    softSkills: [],
+    techSkills: [],
+    industry: [],
+    scope: [],
+    jobType: [],
   });
 
   const [filterOptions, setFilterOptions] = useState({
@@ -37,41 +35,58 @@ const JobSearch = ({ onSearch }) => {
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/filters`)
       .then(response => response.json())
-      .then(data => setFilterOptions(data))
+      .then(data => {
+        console.log('Fetched filter options:', data);
+        setFilterOptions(data);
+      })
       .catch(error => console.error('Error fetching filter options:', error));
   }, []);
 
   useEffect(() => {
     if (isCleared) {
-      onSearch({ title, city, filters });
-      setIsCleared(false); // Reset the cleared state after performing the search
+      console.log('Filters cleared, performing search');
+      handleSearch();
+      setIsCleared(false);
     }
-  }, [isCleared, title, city, filters, onSearch]);
-
+  }, [isCleared]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFilters({ ...filters, [name]: value });
+    console.log(`Filter changed: ${name}`, value);
+    setFilters(prevFilters => ({ ...prevFilters, [name]: value }));
+  };
+
+  const formatFiltersForBackend = (filters) => {
+    const formattedFilters = {};
+    for (const [key, value] of Object.entries(filters)) {
+      if (value.length > 0) {
+        // Join multiple values with commas or use the first value
+        formattedFilters[key] = value.length > 1 ? value.join(',') : value[0];
+      }
+    }
+    return formattedFilters;
   };
 
   const handleSearch = () => {
-    onSearch({ title, city, filters });
+    const formattedFilters = formatFiltersForBackend(filters);
+    console.log('Performing search with:', { title, filters: formattedFilters });
+    onSearch({ title, filters: formattedFilters });
   };
 
   const handleClear = () => {
+    console.log('Clearing all filters');
     setTitle('');
-    setCity('');
     setFilters({
-      company: '',
-      location: '',
-      datePosted: '',
-      fieldOfExpertise: '',
-      minExperience: '',
-      softSkills: '',
-      techSkills: '',
-      industry: '',
-      scope: '',
-      jobType: '',
+      company: [],
+      location: [],
+      datePosted: [],
+      fieldOfExpertise: [],
+      minExperience: [],
+      softSkills: [],
+      techSkills: [],
+      industry: [],
+      scope: [],
+      jobType: [],
     });
     setIsCleared(true);
   };
@@ -86,19 +101,11 @@ const JobSearch = ({ onSearch }) => {
           onChange={(e) => setTitle(e.target.value)}
           className="search-input"
         />
-        {/* <input
-          type="text"
-          placeholder="Search by city"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          className="search-input"
-        /> */}
         <button onClick={handleSearch} className="search-button">Search</button>
         <button onClick={handleClear} className="clear-button">Clear</button>
       </div>
       <div className="filter-dropdowns">
-          <FilterDropDowns filters={filters} filterOptions={filterOptions} handleInputChange={handleInputChange} />
-
+        <FilterDropDowns filters={filters} filterOptions={filterOptions} handleInputChange={handleInputChange} />
       </div>
     </div>
   );
