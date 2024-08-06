@@ -1,54 +1,93 @@
-import React from 'react';
-import MultiSelectDropdown from './MultiSelectDropdown';
-import './FilterDropDowns.css'
+
+import React, { useState } from 'react';
+import './FilterDropDowns.css';
 
 const FilterDropDowns = ({ filters, filterOptions, handleInputChange }) => {
   const dropdownConfigs = [
-    { name: "company", placeholder: "Company", title: "Company" },
-    { name: "location", placeholder: "Location", title: "Location" },
-    { name: "datePosted", placeholder: "Date posted", title: "Date posted" },
-    { name: "fieldOfExpertise", placeholder: "Field of expertise", title: "Field of expertise" },
-    { name: "minExperience", placeholder: "Minimum experience", title: "Minimum experience" },
-    { name: "softSkills", placeholder: "Soft skills", title: "Soft skills" },
-    { name: "techSkills", placeholder: "Technical skills", title: "Technical skills" },
-    { name: "industry", placeholder: "Industry", title: "Industry" },
-    { name: "scope", placeholder: "Scope of position", title: "Scope of position" },
-    { name: "jobType", placeholder: "Job type", title: "Job type" }
+    { name: "company", title: "Company" },
+    { name: "location", title: "Location" },
+    { name: "datePosted", title: "Date posted" },
+    { name: "fieldOfExpertise", title: "Field of expertise" },
+    { name: "minExperience", title: "Minimum experience" },
+    { name: "softSkills", title: "Soft skills" },
+    { name: "techSkills", title: "Technical skills" },
+    { name: "industry", title: "Industry" },
+    { name: "scope", title: "Scope of position" },
+    { name: "jobType", title: "Job type" }
   ];
 
-  const handleMultiSelectChange = (name, selectedValues) => {
-    console.log(`selectedValues under handleMultiSelectChange inside FilterDropDowns:`, selectedValues)
-    handleInputChange({ target: { name, value: selectedValues } });
-  };
-
-const selectedValues = {};
-Object.keys(filterOptions).forEach(key => {
-    selectedValues[key] = [];
-});
-
-console.log(`filterOptions under FilterDropDowns:`, filterOptions);
-console.log(`~~~~ filters under FilterDropDowns:`, filters);
-
-return (
-  <div className="dropdown-container">
-    {dropdownConfigs.map(config => {
-      console.log(`filterOptions of ${config.name} under FilterDropDowns:`, filterOptions[config.name]);
-      console.log(`filters of ${config.name} under FilterDropDowns:`, filters[config.name]);
-
-      return (
-        <MultiSelectDropdown
+  return (
+    <div className="dropdown-container">
+      {dropdownConfigs.map(config => (
+        <Dropdown
           key={config.name}
           name={config.name}
-          selectedValues={filters[config.name] || []}
-          onChange={handleMultiSelectChange}
-          options={filterOptions[config.name]}
-          placeholder="All"
           title={config.title}
+          options={filterOptions[config.name]}
+          selectedValues={filters[config.name]}
+          handleInputChange={handleInputChange}
         />
-      );
-    })}
-  </div>
-);
+      ))}
+    </div>
+  );
+};
+
+const Dropdown = ({ name, title, options, selectedValues, handleInputChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleCheckboxChange = (option) => {
+    handleInputChange(name, option);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedValues.length === options.length) {
+      // If all options are selected, unselect all
+      options.forEach(option => handleInputChange(name, option));
+    } else {
+      // Otherwise, select all options
+      options.forEach(option => {
+        if (!selectedValues.includes(option)) {
+          handleInputChange(name, option);
+        }
+      });
+    }
+  };
+
+  return (
+    <div className="dropdown">
+      <button className="dropdown-button" onClick={() => setIsOpen(!isOpen)}>
+        {title}
+      </button>
+      {isOpen && (
+        <div className="dropdown-content">
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id={`${name}-all`}
+              checked={selectedValues.length === options.length}
+              onChange={handleSelectAll}
+            />
+            <label htmlFor={`${name}-all`}>All</label>
+          </div>
+          {options.map(option => (
+            <div key={option} className="checkbox-item">
+              <input
+                type="checkbox"
+                id={`${name}-${option}`}
+                value={option}
+                checked={selectedValues.includes(option)}
+                onChange={() => handleCheckboxChange(option)}
+              />
+              <label htmlFor={`${name}-${option}`}>{option}</label>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default FilterDropDowns;
+
+
+

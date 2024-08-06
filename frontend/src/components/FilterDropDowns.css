@@ -1,19 +1,48 @@
-/* Styles for the dropdown container */
 .dropdown-container {
-  margin-bottom: 10px; /* Add space between dropdowns */
-  width: 150px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
-/* Styles for the label */
-.dropdown-container label {
-  display: block;
-  margin-bottom: 0.5rem;
+.dropdown {
+  position: relative;
+  display: inline-block;
 }
 
-/* Styles for the dropdown select */
-.filter-dropdown {
-  width: 75%; /* Adjust the width as needed */
-  height: 40px; /* Adjust the height as needed */
-  padding: 0.540rem;
-  font-size: 1rem;
+.dropdown-button {
+  background-color: #f1f1f1;
+  color: black;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.dropdown-button:hover,
+.dropdown-button:focus {
+  background-color: #ddd;
+}
+
+.dropdown-content {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  z-index: 1;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.checkbox-item {
+  margin: 5px 0;
+}
+
+.checkbox-item input {
+  margin-right: 10px;
 }

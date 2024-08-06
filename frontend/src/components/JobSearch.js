@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import './JobSearch.css';
 import FilterDropDowns from './FilterDropDowns';
@@ -50,18 +51,20 @@ const JobSearch = ({ onSearch }) => {
     }
   }, [isCleared]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log(`Filter changed: ${name}`, value);
-    setFilters(prevFilters => ({ ...prevFilters, [name]: value }));
+  const handleInputChange = (name, value) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [name]: prevFilters[name].includes(value)
+        ? prevFilters[name].filter(item => item !== value)
+        : [...prevFilters[name], value]
+    }));
   };
 
   const formatFiltersForBackend = (filters) => {
     const formattedFilters = {};
     for (const [key, value] of Object.entries(filters)) {
       if (value.length > 0) {
-        // Join multiple values with commas or use the first value
-        formattedFilters[key] = value.length > 1 ? value.join(',') : value[0];
+        formattedFilters[key] = value.join(',');
       }
     }
     return formattedFilters;
@@ -74,7 +77,6 @@ const JobSearch = ({ onSearch }) => {
   };
 
   const handleClear = () => {
-    console.log('Clearing all filters');
     setTitle('');
     setFilters({
       company: [],
@@ -112,3 +114,6 @@ const JobSearch = ({ onSearch }) => {
 };
 
 export default JobSearch;
+
+
+
