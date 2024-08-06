@@ -8,7 +8,6 @@ const FilterCheckboxes = ({ filters, filterOptions, handleInputChange }) => {
     { name: "datePosted", title: "Date posted" },
     { name: "fieldOfExpertise", title: "Field of expertise" },
     { name: "minExperience", title: "Minimum experience" },
-    { name: "softSkills", title: "Soft skills" },
     { name: "techSkills", title: "Technical skills" },
     { name: "industry", title: "Industry" },
     { name: "scope", title: "Scope of position" },
