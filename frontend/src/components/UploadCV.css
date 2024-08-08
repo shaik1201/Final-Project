@@ -1,49 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
 .upload-container {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  justify-content: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+.upload-container h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #2d3748;
+  text-align: center;
+}
+
+.upload-container input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  padding: 12px 25px;
+  background-color: #36C2CE;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-file-upload:hover {
+  background-color: #2980b9;
+}
+
+.upload-button {
+  padding: 12px 25px;
+  background-color: #9CDBA6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-button:hover {
+  background-color: #468585;
+}
+
+.file-name {
+  margin: 10px 0;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .upload-container {
     padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  }
+
+  .custom-file-upload,
+  .upload-button {
+    width: 100%;
     justify-content: center;
-
   }
-  
-  .upload-container input[type="file"] {
-    display: none;
-    transition: background-color 0.3s ease;
-
-  }
-  
-  .upload-container label {
-    padding: 10px 20px;
-    background-color: #405D72;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .upload-container label:hover {
-    background-color: #758694;
-  }
-  
-  .upload-container button {
-    padding: 10px 20px;
-    background-color: #405D72;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .upload-container button:hover {
-    background-color: #758694;
-  }
-  
+}

@@ -1,22 +1,20 @@
-// src/JobSearch.js
 import React, { useState, useEffect } from 'react';
 import './JobSearch.css';
-import FilterDropDowns from './FilterDropDowns.js'
+import FilterDropDowns from './FilterDropDowns.js';
 
 const JobSearch = ({ onSearch }) => {
   const [title, setTitle] = useState('');
-  const [city, setCity] = useState('');
   const [filters, setFilters] = useState({
-    company: '',
-    location: '',
-    datePosted: '',
-    fieldOfExpertise: '',
-    minExperience: '',
-    softSkills: '',
-    techSkills: '',
-    industry: '',
-    scope: '',
-    jobType: '',
+    company: [],
+    location: [],
+    datePosted: [],
+    fieldOfExpertise: [],
+    minExperience: [],
+    softSkills: [],
+    techSkills: [],
+    industry: [],
+    scope: [],
+    jobType: [],
   });
 
   const [filterOptions, setFilterOptions] = useState({
@@ -37,41 +35,59 @@ const JobSearch = ({ onSearch }) => {
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/filters`)
       .then(response => response.json())
-      .then(data => setFilterOptions(data))
+      .then(data => {
+        console.log('Fetched filter options:', data);
+        setFilterOptions(data);
+      })
       .catch(error => console.error('Error fetching filter options:', error));
   }, []);
 
   useEffect(() => {
     if (isCleared) {
-      onSearch({ title, city, filters });
-      setIsCleared(false); // Reset the cleared state after performing the search
+      console.log('Filters cleared, performing search');
+      handleSearch();
+      setIsCleared(false);
     }
-  }, [isCleared, title, city, filters, onSearch]);
+  }, [isCleared]);
 
+  const handleInputChange = (name, value) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [name]: prevFilters[name].includes(value)
+        ? prevFilters[name].filter(item => item !== value)
+        : [...prevFilters[name], value]
+    }));
+  };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFilters({ ...filters, [name]: value });
+  const formatFiltersForBackend = (filters) => {
+    const formattedFilters = {};
+    for (const [key, value] of Object.entries(filters)) {
+      if (value.length > 0) {
+        formattedFilters[key] = value.join(',');
+      }
+    }
+    return formattedFilters;
   };
 
   const handleSearch = () => {
-    onSearch({ title, city, filters });
+    const formattedFilters = formatFiltersForBackend(filters);
+    console.log('Performing search with:', { title, filters: formattedFilters });
+    onSearch({ title, filters: formattedFilters });
   };
 
   const handleClear = () => {
     setTitle('');
-    setCity('');
     setFilters({
-      company: '',
-      location: '',
-      datePosted: '',
-      fieldOfExpertise: '',
-      minExperience: '',
-      softSkills: '',
-      techSkills: '',
-      industry: '',
-      scope: '',
-      jobType: '',
+      company: [],
+      location: [],
+      datePosted: [],
+      fieldOfExpertise: [],
+      minExperience: [],
+      softSkills: [],
+      techSkills: [],
+      industry: [],
+      scope: [],
+      jobType: [],
     });
     setIsCleared(true);
   };
@@ -85,20 +101,21 @@ const JobSearch = ({ onSearch }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="search-input"
+          aria-label="Search by job title"
         />
-        {/* <input
-          type="text"
-          placeholder="Search by city"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          className="search-input"
-        /> */}
-        <button onClick={handleSearch} className="search-button">Search</button>
-        <button onClick={handleClear} className="clear-button">Clear</button>
+        <button onClick={handleSearch} className="search-button" aria-label="Search jobs">
+          <i className="fas fa-search"></i> Search
+        </button>
+        <button onClick={handleClear} className="clear-button" aria-label="Clear search">
+          <i className="fas fa-times"></i> Clear
+        </button>
       </div>
       <div className="filter-dropdowns">
-          <FilterDropDowns filters={filters} filterOptions={filterOptions} handleInputChange={handleInputChange} />
-
+        <FilterDropDowns 
+          filters={filters} 
+          filterOptions={filterOptions} 
+          handleInputChange={handleInputChange} 
+        />
       </div>
     </div>
   );

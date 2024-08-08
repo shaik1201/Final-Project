@@ -9,7 +9,7 @@ except Exception as e:
     print(f"Failed to connect to MongoDB: {e}")
 
 class Job:
-    def __init__(self, title, description, job_id, company, location, date, link, Education, Field_of_Expertise, Minimum_Experience, Soft_Skills, Technical_Skills, Industry, Scope_of_Position, Job_Type):
+    def __init__(self, title, description, job_id, company, location, date, link, Education, Field_of_Expertise, Minimum_Experience, Technical_Skills, Industry, Scope_of_Position, Job_Type):
         self.title = title
         self.description = description
         self.job_id = job_id
@@ -20,7 +20,7 @@ class Job:
         self.education = Education
         self.field_of_expertise = Field_of_Expertise
         self.minimum_experience = Minimum_Experience
-        self.soft_skills = Soft_Skills
+        # self.soft_skills = Soft_Skills
         self.technical_skills = Technical_Skills
         self.industry = Industry
         self.scope_of_position = Scope_of_Position
@@ -39,7 +39,7 @@ class Job:
             "education": job_data['Education'],
             "field_of_expertise": job_data['Field of Expertise'],
             "minimum_experience": job_data['Minimum Experience'],
-            "soft_skills": job_data['Soft Skills'],
+            # "soft_skills": job_data['Soft Skills'],
             "technical_skills": job_data['Technical Skills'],
             "industry": job_data['Industry'],
             "scope_of_position": job_data['Scope of Position'],
@@ -56,7 +56,7 @@ class Job:
                     "link": job['link'], "education": job['education'],
                     "field_of_expertise": job['field_of_expertise'],
                     "minimum_experience": job['minimum_experience'],
-                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    "technical_skills": job['technical_skills'],
                     "industry": job['industry'], "scope_of_position": job['scope_of_position'],
                     "job_type": job['job_type']
                     } for job in jobs]
@@ -72,7 +72,7 @@ class Job:
                     "link": job['link'], "education": job['education'],
                     "field_of_expertise": job['field_of_expertise'],
                     "minimum_experience": job['minimum_experience'],
-                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    "technical_skills": job['technical_skills'],
                     "industry": job['industry'], "scope_of_position": job['scope_of_position'],
                     "job_type": job['job_type']
                     }
@@ -88,7 +88,7 @@ class Job:
                     "link": job['link'], "education": job['education'],
                     "field_of_expertise": job['field_of_expertise'],
                     "minimum_experience": job['minimum_experience'],
-                    "soft_skills": job['soft_skills'], "technical_skills": job['technical_skills'],
+                    "technical_skills": job['technical_skills'],
                     "industry": job['industry'], "scope_of_position": job['scope_of_position'],
                     "job_type": job['job_type']
                     }

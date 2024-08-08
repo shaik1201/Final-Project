@@ -21,7 +21,6 @@ const FilterDropdowns = ({ filters, filterOptions, handleInputChange }) => {
     { name: "datePosted", placeholder: "Date posted", title: "Date posted" },
     { name: "fieldOfExpertise", placeholder: "Field of expertise", title: "Field of expertise" },
     { name: "minExperience", placeholder: "Minimum experience", title: "Minimum experience" },
-    { name: "softSkills", placeholder: "Soft skills", title: "Soft skills" },
     { name: "techSkills", placeholder: "Technical skills", title: "Technical skills" },
     { name: "industry", placeholder: "Industry", title: "Industry" },
     { name: "scope", placeholder: "Scope of position", title: "Scope of position" },

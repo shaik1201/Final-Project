@@ -14,20 +14,17 @@ const JobCard = ({ job }) => {
         <h2 className="job-title">{job.title}</h2>
         <span className="job-company">{job.company}</span>
       </div>
-      <div className="job-card-body">
+      <div className={`job-card-body ${showMore ? 'expanded' : 'collapsed'}`}>
         <p className="job-location"><i className="fas fa-map-marker-alt"></i> {job.location}</p>
         <p className="job-date"><i className="far fa-calendar-alt"></i> Posted: {job.date.slice(6)}</p>
-        {showMore && (
-          <div className="job-details">
-            <p className="job-field_of_expertise"><span className="title">Field of expertise:</span> {job.field_of_expertise}</p>
-            <p className="job-minimum_experience"><span className="title">Minimum experience:</span> {job.minimum_experience}</p>
-            <p className="job-soft_skills"><span className="title">Soft skills:</span> {job.soft_skills}</p>
-            <p className="job-technical_skills"><span className="title">Technical skills:</span> {job.technical_skills}</p>
-            <p className="job-industry"><span className="title">Industry:</span> {job.industry}</p>
-            <p className="job-scope_of_position"><span className="title">Scope of position:</span> {job.scope_of_position}</p>
-            <p className="job-job_type"><span className="title">Job type:</span> {job.job_type}</p>
-          </div>
-        )}
+        <div className="job-details">
+          <p className="job-field_of_expertise"><span className="title">Field of expertise:</span> {job.field_of_expertise}</p>
+          <p className="job-minimum_experience"><span className="title">Minimum experience:</span> {job.minimum_experience}</p>
+          <p className="job-technical_skills"><span className="title">Technical skills:</span> {job.technical_skills}</p>
+          <p className="job-industry"><span className="title">Industry:</span> {job.industry}</p>
+          <p className="job-scope_of_position"><span className="title">Scope of position:</span> {job.scope_of_position}</p>
+          <p className="job-job_type"><span className="title">Job type:</span> {job.job_type}</p>
+        </div>
       </div>
       <div className="job-card-footer">
         <button className="button show-more" onClick={handleShowMore}>
