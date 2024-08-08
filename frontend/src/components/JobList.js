@@ -3,6 +3,7 @@ import './JobList.css';
 import JobCard from './JobCard';
 import JobSearch from './JobSearch';
 import UploadCV from './UploadCV';
+import Features from './Features';
 
 const JobList = () => {
   const [jobs, setJobs] = useState([]);
@@ -111,17 +112,22 @@ const JobList = () => {
 
   return (
     <div className="job-list">
+        <Features />
+      
       <div className="container">
-        <h1 className="main-title">Find Your Dream Job</h1>
-        <div className="upload-section">
+        <h1 className="main-title">Discover Your Next Career Move</h1>
+        <div className="search-upload-wrapper">
           <UploadCV onUpload={uploadCV} onFileChange={handleFileChange} />
           <div className="divider">
-            <span>OR</span>
+            <span>or</span>
           </div>
+          <JobSearch onSearch={handleSearch} />
         </div>
-        <JobSearch onSearch={handleSearch} />
         {isLoading ? (
-          <div className="loading-spinner">Loading...</div>
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Finding perfect matches...</p>
+          </div>
         ) : (
           <>
             <div className="job-cards-container">
@@ -131,21 +137,21 @@ const JobList = () => {
             </div>
             <div className="pagination-container">
               <button
-                className="button-navigation"
+                className="button-navigation prev"
                 onClick={handlePrevPage}
                 disabled={currentPage === 1}
               >
-                Previous
+                &larr; Previous
               </button>
               <span className="pagination-info">
                 Page {currentPage} of {Math.ceil(jobs.length / jobsPerPage)}
               </span>
               <button
-                className="button-navigation"
+                className="button-navigation next"
                 onClick={handleNextPage}
                 disabled={currentPage === Math.ceil(jobs.length / jobsPerPage)}
               >
-                Next
+                Next &rarr;
               </button>
             </div>
           </>

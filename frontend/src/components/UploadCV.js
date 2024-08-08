@@ -14,13 +14,15 @@ const UploadCV = ({ onUpload, onFileChange }) => {
 
   return (
     <div className="upload-container">
-        <h2>Upload your CV to get recommended jobs for you</h2><br/>
+      <h2>Upload your CV and let us do the rest 🏖️</h2>
       <label htmlFor="file-upload" className="custom-file-upload">
-        Choose File
+        <i className="fas fa-upload"></i> Choose File
       </label>
       <input id="file-upload" type="file" accept="application/pdf" onChange={handleFileChange} />
       {fileName && <span className="file-name">{fileName}</span>}
-      <button onClick={onUpload}>Upload CV</button>
+      <button onClick={onUpload} className="upload-button">
+        <i className="fas fa-cloud-upload-alt"></i> Upload CV
+      </button>
     </div>
   );
 }

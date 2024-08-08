@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const position = window.pageYOffset;
+      setScrollPosition(position);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${scrollPosition > 50 ? 'scrolled' : ''}`}>
       <div className="navbar-container">
         <NavLink to="/" className="navbar-logo">
-          AI For Job Searching
+          LLM For Job Searching
         </NavLink>
         <ul className="nav-menu">
           <li className="nav-item">
