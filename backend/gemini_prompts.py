@@ -497,4 +497,7 @@ if __name__ == '__main__':
     # Job.clean_and_delete_jobs()
     # print("Jobs scraped successfully!")
 
+    # delete old jobs
+    Job.delete_old_jobs()
+
 

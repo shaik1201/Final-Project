@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from datetime import datetime, timedelta
 import config
 import math
 
@@ -141,6 +142,31 @@ class Job:
                 if update_fields:
                     print(f"Updating job with ID: {job_id} with fields: {update_fields}")
                     db.jobs.update_one({"_id": job_id}, {"$set": update_fields})
+
+
+    @staticmethod
+    def delete_old_jobs():
+        # Calculate the date one month ago from today
+        one_month_ago = datetime.now() - timedelta(days=30)
+
+        # Find and delete jobs that were posted more than a month ago
+        deleted_count = 0
+        for job in db.jobs.find():
+            job_date_str = job.get("date")
+            if job_date_str:
+                try:
+                    # Assuming the date is stored as a string in 'YYYY-MM-DD' format
+                    job_date = datetime.strptime(job_date_str, '%Y-%m-%d')
+
+                    if job_date < one_month_ago:
+                        print(
+                            f"Deleting job with ID: {job['_id']}, Title: {job.get('title', 'No title')}, Date: {job_date_str}")
+                        db.jobs.delete_one({"_id": job["_id"]})
+                        deleted_count += 1
+                except ValueError:
+                    print(f"Skipping job with ID: {job['_id']} due to invalid date format: {job_date_str}")
+
+        print(f"Total jobs deleted: {deleted_count}")
 
 
 
