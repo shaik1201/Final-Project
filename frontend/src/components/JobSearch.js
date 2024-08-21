@@ -89,13 +89,6 @@ const JobSearch = ({ onSearch }) => {
     setIsCleared(true);
   };
 
-  // Handle keypress event to trigger search on "Enter"
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
   return (
     <div className="search-container">
       <div className="search-inputs">
@@ -104,7 +97,6 @@ const JobSearch = ({ onSearch }) => {
           placeholder="Search by title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={handleKeyPress} // Added onKeyDown event listener
           className="search-input"
           aria-label="Search by job title"
         />
