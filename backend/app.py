@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from models import Job
 from flask_cors import CORS
+from datetime import datetime, timedelta
+
 # from jobs_scrapper import get_indeed_jobs
 from pymongo import MongoClient
 import config
@@ -92,8 +94,20 @@ def search_jobs():
     user_scope = filters['filters'].get('scope', '')
     user_job_type = filters['filters'].get('jobType', '')
 
+    # Determine the date threshold based on the selected option
+    now = datetime.now()
+    if user_date_posted == "Past 3 Days":
+        date_threshold = now - timedelta(days=4)
+    elif user_date_posted == "Past 7 Days":
+        date_threshold = now - timedelta(days=8)
+    elif user_date_posted == "Past 14 Days":
+        date_threshold = now - timedelta(days=15)
+    elif user_date_posted == "Past 1 Month":
+        date_threshold = now - timedelta(days=31)
+    else:
+        date_threshold = None
+
     job_list = Job.get_all_jobs()
-    print(user_job_type)
 
     relevant_jobs = []
     for job in job_list:
@@ -104,8 +118,6 @@ def search_jobs():
         if user_company and user_company not in job['company']:
             continue
         if user_location and user_location not in job['location']:
-            continue
-        if user_date_posted and user_date_posted not in job['date']:
             continue
         if user_field_of_expertise and user_field_of_expertise not in job['field_of_expertise']:
             continue
@@ -122,6 +134,12 @@ def search_jobs():
         if user_job_type and user_job_type not in job['job_type']:
             continue
 
+        # Filter by date if a date threshold is set
+        if date_threshold:
+            job_date = datetime.strptime(job['date'], '%Y-%m-%d')
+            if job_date < date_threshold:
+                continue
+
         relevant_jobs.append(job)
 
     return jsonify(relevant_jobs)
@@ -134,13 +152,75 @@ def get_filters():
 
 
 
+# def get_unique_filter_values():
+#     def add_to_set(name, distinct_values, result_set):
+#         exclude_set = {"etc.", "None", "Other", "none", "other", "nan"}  # Add any other values you want to exclude here
+#         for value in distinct_values:
+#             if value:
+#                 if name == "company" or name == 'location':
+#                     # Use a simpler split for companies and locations
+#                     parts = re.split(r'or | and | / | \(|\)', value)
+#                 else:
+#                     # Use the original, more complex split for other attributes
+#                     parts = re.split(r', | or | and | / | \(|\)', value)
+#
+#                 for part in parts:
+#                     clean_part = part.strip()
+#                     if clean_part and clean_part not in exclude_set and "מחוז" not in clean_part:
+#                         result_set.add(clean_part)
+#
+#     companies = set()
+#     add_to_set("company", db.jobs.distinct("company"), companies)
+#
+#     locations = set()
+#     add_to_set("location", db.jobs.distinct("location"), locations)
+#
+#     fields_of_expertise = set()
+#     add_to_set("field_of_expertise", db.jobs.distinct("field_of_expertise"), fields_of_expertise)
+#
+#     min_experience = set()
+#     add_to_set("minimum_experience", db.jobs.distinct("minimum_experience"), min_experience)
+#
+#     soft_skills = set()
+#     add_to_set("soft_skills", db.jobs.distinct("soft_skills"), soft_skills)
+#
+#     tech_skills = set()
+#     add_to_set("technical_skills", db.jobs.distinct("technical_skills"), tech_skills)
+#
+#     industries = set()
+#     add_to_set("industry", db.jobs.distinct("industry"), industries)
+#
+#     scopes = set()
+#     add_to_set("scope_of_position", db.jobs.distinct("scope_of_position"), scopes)
+#
+#     job_types = set()
+#     add_to_set("job_type", db.jobs.distinct("job_type"), job_types)
+#
+#     # Predefined date options in the correct order
+#     dates_posted = ["3 days ago", "7 days ago", "14 days ago", "1 month ago"]
+#
+#     unique_filters = {
+#         "company": sorted(list(companies)),
+#         "location": sorted(list(locations)),
+#         "datePosted": dates_posted,  # Explicit order
+#         "fieldOfExpertise": sorted(list(fields_of_expertise)),
+#         "minExperience": sorted(list(min_experience)),
+#         "softSkills": sorted(list(soft_skills)),
+#         "techSkills": sorted(list(tech_skills)),
+#         "industry": sorted(list(industries)),
+#         "scope": sorted(list(scopes)),
+#         "jobType": sorted(list(job_types))
+#     }
+#
+#     return unique_filters
+
 def get_unique_filter_values():
     def add_to_set(name, distinct_values, result_set):
         exclude_set = {"etc.", "None", "Other", "none", "other", "nan"}  # Add any other values you want to exclude here
         for value in distinct_values:
             if value:
                 if name == "company" or name == 'location':
-                    # Use a simpler split for companies
+                    # Use a simpler split for companies and locations
                     parts = re.split(r'or | and | / | \(|\)', value)
                 else:
                     # Use the original, more complex split for other attributes
@@ -151,15 +231,11 @@ def get_unique_filter_values():
                     if clean_part and clean_part not in exclude_set and "מחוז" not in clean_part:
                         result_set.add(clean_part)
 
-    # Usage of add_to_set with the name parameter
     companies = set()
     add_to_set("company", db.jobs.distinct("company"), companies)
 
     locations = set()
     add_to_set("location", db.jobs.distinct("location"), locations)
-
-    dates_posted = set()
-    add_to_set("date", db.jobs.distinct("date"), dates_posted)
 
     fields_of_expertise = set()
     add_to_set("field_of_expertise", db.jobs.distinct("field_of_expertise"), fields_of_expertise)
@@ -182,16 +258,13 @@ def get_unique_filter_values():
     job_types = set()
     add_to_set("job_type", db.jobs.distinct("job_type"), job_types)
 
-    # Translate locations
-    # translated_locations = set()
-    # for location in locations:
-    #     translated_location = GoogleTranslator(source='iw', target='en').translate(location)
-    #     translated_locations.add(translated_location)
+    # Predefined date options in the correct order with new labels
+    dates_posted = ["Past 3 Days", "Past 7 Days", "Past 14 Days", "Past 1 Month"]
 
     unique_filters = {
         "company": sorted(list(companies)),
         "location": sorted(list(locations)),
-        "datePosted": sorted(list(dates_posted)),  # You might want to dynamically calculate these
+        "datePosted": dates_posted,  # Explicit order with new labels
         "fieldOfExpertise": sorted(list(fields_of_expertise)),
         "minExperience": sorted(list(min_experience)),
         "softSkills": sorted(list(soft_skills)),
@@ -202,7 +275,6 @@ def get_unique_filter_values():
     }
 
     return unique_filters
-
 
 
 if __name__ == '__main__':
