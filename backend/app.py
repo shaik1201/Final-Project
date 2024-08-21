@@ -135,46 +135,52 @@ def get_filters():
 
 
 def get_unique_filter_values():
-    def add_to_set(distinct_values, result_set):
-        exclude_set = {"etc.", "None", "Other", "none", "other"}  # Add any other values you want to exclude here
+    def add_to_set(name, distinct_values, result_set):
+        exclude_set = {"etc.", "None", "Other", "none", "other", "nan"}  # Add any other values you want to exclude here
         for value in distinct_values:
             if value:
-                # Split by comma, 'or', 'and', '/', etc.
-                parts = re.split(r', | or | and | / | \(|\)', value)
+                if name == "company" or name == 'location':
+                    # Use a simpler split for companies
+                    parts = re.split(r'or | and | / | \(|\)', value)
+                else:
+                    # Use the original, more complex split for other attributes
+                    parts = re.split(r', | or | and | / | \(|\)', value)
+
                 for part in parts:
                     clean_part = part.strip()
-                    if clean_part and clean_part not in exclude_set and "מחוז" not in clean_part :
+                    if clean_part and clean_part not in exclude_set and "מחוז" not in clean_part:
                         result_set.add(clean_part)
 
+    # Usage of add_to_set with the name parameter
     companies = set()
-    add_to_set(db.jobs.distinct("company"), companies)
+    add_to_set("company", db.jobs.distinct("company"), companies)
 
     locations = set()
-    add_to_set(db.jobs.distinct("location"), locations)
+    add_to_set("location", db.jobs.distinct("location"), locations)
 
     dates_posted = set()
-    add_to_set(db.jobs.distinct("date"), dates_posted)
+    add_to_set("date", db.jobs.distinct("date"), dates_posted)
 
     fields_of_expertise = set()
-    add_to_set(db.jobs.distinct("field_of_expertise"), fields_of_expertise)
+    add_to_set("field_of_expertise", db.jobs.distinct("field_of_expertise"), fields_of_expertise)
 
     min_experience = set()
-    add_to_set(db.jobs.distinct("minimum_experience"), min_experience)
+    add_to_set("minimum_experience", db.jobs.distinct("minimum_experience"), min_experience)
 
     soft_skills = set()
-    add_to_set(db.jobs.distinct("soft_skills"), soft_skills)
+    add_to_set("soft_skills", db.jobs.distinct("soft_skills"), soft_skills)
 
     tech_skills = set()
-    add_to_set(db.jobs.distinct("technical_skills"), tech_skills)
+    add_to_set("technical_skills", db.jobs.distinct("technical_skills"), tech_skills)
 
     industries = set()
-    add_to_set(db.jobs.distinct("industry"), industries)
+    add_to_set("industry", db.jobs.distinct("industry"), industries)
 
     scopes = set()
-    add_to_set(db.jobs.distinct("scope_of_position"), scopes)
+    add_to_set("scope_of_position", db.jobs.distinct("scope_of_position"), scopes)
 
     job_types = set()
-    add_to_set(db.jobs.distinct("job_type"), job_types)
+    add_to_set("job_type", db.jobs.distinct("job_type"), job_types)
 
     # Translate locations
     # translated_locations = set()

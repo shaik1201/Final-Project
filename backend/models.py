@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import config
+import math
 
 try:
     client = MongoClient(config.MONGO_URI)
@@ -20,7 +21,6 @@ class Job:
         self.education = Education
         self.field_of_expertise = Field_of_Expertise
         self.minimum_experience = Minimum_Experience
-        # self.soft_skills = Soft_Skills
         self.technical_skills = Technical_Skills
         self.industry = Industry
         self.scope_of_position = Scope_of_Position
@@ -39,7 +39,6 @@ class Job:
             "education": job_data['Education'],
             "field_of_expertise": job_data['Field of Expertise'],
             "minimum_experience": job_data['Minimum Experience'],
-            # "soft_skills": job_data['Soft Skills'],
             "technical_skills": job_data['Technical Skills'],
             "industry": job_data['Industry'],
             "scope_of_position": job_data['Scope of Position'],
@@ -50,7 +49,7 @@ class Job:
 
     @staticmethod
     def get_all_jobs():
-        jobs = db.jobs.find()
+        jobs = db.jobs.find().sort([("date", -1), ("title", 1)])  # Sort by date (descending) and then by title (ascending)
         job_list = [{"title": job["title"], "description": job["description"],
                     "job_id": job['job_id'], "company": job['company'],
                     "location": job['location'], "date": job['date'],
@@ -99,4 +98,51 @@ class Job:
     @staticmethod
     def delete_job(job_id):
         db.jobs.delete_one({"_id": job_id})
+
+    @staticmethod
+    def print_all_jobs():
+        jobs = db.jobs.find()
+        for job in jobs:
+            print(job)
+
+    import math
+
+    @staticmethod
+    def clean_and_delete_jobs():
+        jobs = db.jobs.find()
+
+        for job in jobs:
+            job_id = job["_id"]
+            title = job.get("title")
+            link = job.get("link")
+            company = job.get("company")
+
+            # Check if 'title', 'link', or 'company' are NaN or None
+            if (title is None or (isinstance(title, float) and math.isnan(title))) or \
+                    (link is None or (isinstance(link, float) and math.isnan(link))) or \
+                    (company is None or (isinstance(company, float) and math.isnan(company))):
+                print(f"Deleting job with ID: {job_id} due to NaN in title, link, or company")
+                db.jobs.delete_one({"_id": job_id})
+            else:
+                # Check other fields and replace NaN or None with "Other"
+                fields_to_check = [
+                    "description", "location", "date", "education",
+                    "field_of_expertise", "minimum_experience",
+                    "technical_skills", "industry", "scope_of_position", "job_type"
+                ]
+
+                update_fields = {}
+                for field in fields_to_check:
+                    value = job.get(field)
+                    if value is None or (isinstance(value, float) and math.isnan(value)):
+                        update_fields[field] = "No Specified"
+
+                # Update the job if there are fields to update
+                if update_fields:
+                    print(f"Updating job with ID: {job_id} with fields: {update_fields}")
+                    db.jobs.update_one({"_id": job_id}, {"$set": update_fields})
+
+
+
+
 

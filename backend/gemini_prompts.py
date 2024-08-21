@@ -436,58 +436,12 @@ def isValidJobType(value):
 
 
 if __name__ == '__main__':
-    # skills = ["Software Engineer", "Data Scientist", "Data Engineer", "Data Analyst", "Business Intelligence (BI) Developer", "DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity Engineer", "Product Manager"]
-    #
-    # # skill = 'Data Analyst'.strip()
-    # num_jobs = 100
-    # sort = 'date'
-    #
-    # # Create the 'jobs' folder if it doesn't exist
-    # os.makedirs('jobs', exist_ok=True)
-    #
-    # # Scrape the jobs from Indeed
-    # scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs, sort)
-    # scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs, sort)
-    #
-    # # # Convert the scraped data to DataFrame
-    # # df_indeed = pd.DataFrame(scrapped_indeed_jobs_dict)
-    # # df_linkedin = pd.DataFrame(scrapped_linkedin_jobs_dict)
-    #
-    # # Save the DataFrames to CSV files in the 'jobs' folder
-    # # df_indeed.to_csv('jobs/Jobs_Indeed.csv', index=False)
-    # # df_linkedin.to_csv('jobs/Jobs_LinkedIn.csv', index=False)
-    #
-    # # Read the CSV files back into dictionaries
-    # # scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed.csv').to_dict('records')
-    # # scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn.csv').to_dict('records')
-    #
-    # # Edit the scrapped jobs data and add the new features
-    # indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
-    # linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
-    #
-    # # Convert the updated job data to DataFrames
-    # df_indeed_update = pd.DataFrame(indeed_jobs)
-    # df_linkedin_update = pd.DataFrame(linkedin_jobs)
-    #
-    # # Save the updated DataFrames to CSV files in the 'jobs' folder
-    # df_indeed_update.to_csv('jobs/Jobs_Indeed_update.csv', index=False)
-    # df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_update.csv', index=False)
-    #
-    # # Store the jobs into the database MongoDB
-    # for job in indeed_jobs:
-    #     Job.create_job(job)
-    #
-    # for job in linkedin_jobs:
-    #     Job.create_job(job)
-    # print("Jobs scraped successfully!")
+    skills_indeed = ["Software Engineer", "Data Scientist", "Data Engineer", "Data Analyst", "Business Intelligence (BI) Developer"]
+    skills_linkedin = ["DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity Engineer", "Product Manager"]
 
+    num_jobs_per_skill = 10
+    sort = 'date'
 
-    # skills_indeed = ["Software Engineer", "Data Scientist", "Data Engineer", "Data Analyst", "Business Intelligence (BI) Developer"]
-    # skills_linkedin = ["DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity Engineer", "Product Manager"]
-    #
-    # num_jobs_per_skill = 10
-    # sort = 'date'
-    #
     # # Create the 'jobs' folder if it doesn't exist
     # os.makedirs('jobs', exist_ok=True)
     #
@@ -520,7 +474,7 @@ if __name__ == '__main__':
 
     # Read the CSV files back into dictionaries
     # scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed_1.csv').to_dict('records')
-    scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn_1.csv').to_dict('records')
+    # scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn_1.csv').to_dict('records')
 
     # Edit the scrapped jobs data and add the new features
     # indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
@@ -530,11 +484,17 @@ if __name__ == '__main__':
     # for job in indeed_jobs:
     #     Job.create_job(job)
 
-    linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
-    df_linkedin_update = pd.DataFrame(linkedin_jobs)
-    df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_update_1.csv', index=False)
-    for job in linkedin_jobs:
-        Job.create_job(job)
-    print("Jobs scraped successfully!")
+    # linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
+    # df_linkedin_update = pd.DataFrame(linkedin_jobs)
+    # df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_update_1.csv', index=False)
+
+    # read Jobs_LinkedIn_update_1.csv
+    # df = pd.read_csv('jobs/Jobs_LinkedIn_update_1.csv')
+    # linkedin_jobs = df.to_dict('records')
+    # for job in linkedin_jobs:
+    #     Job.create_job(job)
+
+    # Job.clean_and_delete_jobs()
+    # print("Jobs scraped successfully!")
 
 
