@@ -436,16 +436,16 @@ def isValidJobType(value):
 
 
 if __name__ == '__main__':
-    skills_indeed = ["Software Engineer", "Data Scientist", "Data Engineer", "Data Analyst", "Business Intelligence (BI) Developer"]
-    skills_linkedin = ["DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity Engineer", "Product Manager"]
-
+    # skills_indeed = ["Software Engineer", "Data Scientist", "Data Engineer", "Data Analyst", "Business Intelligence (BI) Developer"]
+    # skills_linkedin = ["DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity Engineer", "Product Manager"]
+    skills_indeed = ['Student', 'Part-Time']
     num_jobs_per_skill = 10
     sort = 'date'
 
-    # # Create the 'jobs' folder if it doesn't exist
+    # Create the 'jobs' folder if it doesn't exist
     # os.makedirs('jobs', exist_ok=True)
-    #
-    # # Initialize empty lists to store job data
+
+    # Initialize empty lists to store job data
     # indeed_jobs = []
     # linkedin_jobs = []
     #
@@ -454,32 +454,32 @@ if __name__ == '__main__':
     #     scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs_per_skill, sort)
     #     # Edit the scraped data and add new features
     #     indeed_jobs.extend(scrapped_indeed_jobs_dict)
-    #
+
     # # Scrape jobs from LinkedIn for the last five skills
     # for skill in skills_linkedin:  # Last five skills
     #     scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs_per_skill, sort)
     #     # Edit the scraped data and add new features
     #     linkedin_jobs.extend(scrapped_linkedin_jobs_dict)
     #
-    # # indeed_jobs.extend(edit_data(indeed_jobs, prompts_dict))
-    # # linkedin_jobs.extend(edit_data(linkedin_jobs, prompts_dict))
+    # indeed_jobs.extend(edit_data(indeed_jobs, prompts_dict))
+    # linkedin_jobs.extend(edit_data(linkedin_jobs, prompts_dict))
     #
     # # Convert the updated job data to DataFrames
     # df_indeed_update = pd.DataFrame(indeed_jobs)
     # df_linkedin_update = pd.DataFrame(linkedin_jobs)
     #
     # # Save the updated DataFrames to CSV files in the 'jobs' folder
-    # df_indeed_update.to_csv('jobs/Jobs_Indeed_1.csv', index=False)
+    # df_indeed_update.to_csv('jobs/Jobs_Indeed_New.csv', index=False)
     # df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_1.csv', index=False)
 
     # Read the CSV files back into dictionaries
-    # scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed_1.csv').to_dict('records')
+    # scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed_New.csv').to_dict('records')
     # scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn_1.csv').to_dict('records')
 
     # Edit the scrapped jobs data and add the new features
     # indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
     # df_indeed_update = pd.DataFrame(indeed_jobs)
-    # df_indeed_update.to_csv('jobs/Jobs_Indeed_update_1.csv', index=False)
+    # df_indeed_update.to_csv('jobs/Jobs_Indeed_update_New.csv', index=False)
     # Store the jobs into the database MongoDB
     # for job in indeed_jobs:
     #     Job.create_job(job)
@@ -500,8 +500,8 @@ if __name__ == '__main__':
     # delete old jobs
     # Job.delete_old_jobs()
 
-    # print("Deleting duplicate jobs based on job_id...")
-    # Job.delete_duplicate_jobs()
+    print("Deleting duplicate jobs based on job_id...")
+    Job.delete_duplicate_jobs()
 
     # print("All Jobs in the Database:")
     # Job.print_all_jobs()

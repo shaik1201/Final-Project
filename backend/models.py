@@ -170,9 +170,20 @@ class Job:
 
     @staticmethod
     def delete_duplicate_jobs():
-        # Use an aggregation pipeline to find duplicate job_ids
+        # Use an aggregation pipeline to find duplicates based on date, title, company, and location
         pipeline = [
-            {"$group": {"_id": "$job_id", "count": {"$sum": 1}, "ids": {"$push": "$_id"}}},
+            {
+                "$group": {
+                    "_id": {
+                        "date": "$date",
+                        "title": "$title",
+                        "company": "$company",
+                        "location": "$location"
+                    },
+                    "count": {"$sum": 1},
+                    "ids": {"$push": "$_id"}
+                }
+            },
             {"$match": {"count": {"$gt": 1}}}
         ]
 
@@ -180,7 +191,7 @@ class Job:
         deleted_count = 0
 
         for duplicate in duplicates:
-            job_id = duplicate["_id"]
+            job_identifiers = duplicate["_id"]
             job_ids = duplicate["ids"]
 
             # Keep the first job, delete the rest
@@ -189,10 +200,10 @@ class Job:
             for _id in job_ids_to_delete:
                 db.jobs.delete_one({"_id": _id})
                 deleted_count += 1
-                print(f"Deleted duplicate job with job_id: {job_id}, _id: {_id}")
+                print(f"Deleted duplicate job with date: {job_identifiers['date']}, title: {job_identifiers['title']}, "
+                      f"company: {job_identifiers['company']}, location: {job_identifiers['location']}, _id: {_id}")
 
         print(f"Total duplicate jobs deleted: {deleted_count}")
-
 
     # delete jobs not from israel
     @staticmethod
