@@ -498,6 +498,14 @@ if __name__ == '__main__':
     # print("Jobs scraped successfully!")
 
     # delete old jobs
-    Job.delete_old_jobs()
+    # Job.delete_old_jobs()
+
+    # print("Deleting duplicate jobs based on job_id...")
+    # Job.delete_duplicate_jobs()
+
+    # print("All Jobs in the Database:")
+    # Job.print_all_jobs()
+
+
 
 

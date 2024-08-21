@@ -168,6 +168,44 @@ class Job:
 
         print(f"Total jobs deleted: {deleted_count}")
 
+    @staticmethod
+    def delete_duplicate_jobs():
+        # Use an aggregation pipeline to find duplicate job_ids
+        pipeline = [
+            {"$group": {"_id": "$job_id", "count": {"$sum": 1}, "ids": {"$push": "$_id"}}},
+            {"$match": {"count": {"$gt": 1}}}
+        ]
+
+        duplicates = list(db.jobs.aggregate(pipeline))
+        deleted_count = 0
+
+        for duplicate in duplicates:
+            job_id = duplicate["_id"]
+            job_ids = duplicate["ids"]
+
+            # Keep the first job, delete the rest
+            job_ids_to_delete = job_ids[1:]  # Keep the first one, delete the rest
+
+            for _id in job_ids_to_delete:
+                db.jobs.delete_one({"_id": _id})
+                deleted_count += 1
+                print(f"Deleted duplicate job with job_id: {job_id}, _id: {_id}")
+
+        print(f"Total duplicate jobs deleted: {deleted_count}")
+
+
+    # delete jobs not from israel
+    @staticmethod
+    def delete_jobs_by_location(locations):
+        # Build the query to match jobs with locations in the specified list
+        query = {"location": {"$in": locations}}
+
+        # Delete the matching jobs
+        result = db.jobs.delete_many(query)
+
+        print(f"Deleted {result.deleted_count} jobs with specified locations.")
+
+
 
 
 
