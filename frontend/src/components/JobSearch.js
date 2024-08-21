@@ -126,4 +126,5 @@ const JobSearch = ({ onSearch }) => {
   );
 };
 
+
 export default JobSearch;
