@@ -10,7 +10,6 @@ const JobSearch = ({ onSearch }) => {
     datePosted: [],
     fieldOfExpertise: [],
     minExperience: [],
-    softSkills: [],
     techSkills: [],
     industry: [],
     scope: [],
@@ -23,7 +22,6 @@ const JobSearch = ({ onSearch }) => {
     datePosted: [],
     fieldOfExpertise: [],
     minExperience: [],
-    softSkills: [],
     techSkills: [],
     industry: [],
     scope: [],
@@ -50,14 +48,35 @@ const JobSearch = ({ onSearch }) => {
     }
   }, [isCleared]);
 
+  // const handleInputChange = (name, value) => {
+  //   setFilters(prevFilters => ({
+  //     ...prevFilters,
+  //     [name]: prevFilters[name].includes(value)
+  //       ? prevFilters[name].filter(item => item !== value)
+  //       : [...prevFilters[name], value]
+  //   }));
+  // };
+
   const handleInputChange = (name, value) => {
-    setFilters(prevFilters => ({
+  setFilters(prevFilters => {
+    const currentFilter = prevFilters[name];
+
+    // Check if currentFilter is defined and is an array
+    if (!Array.isArray(currentFilter)) {
+      return prevFilters; // Return previous filters without updating to avoid errors
+    }
+
+    return {
       ...prevFilters,
-      [name]: prevFilters[name].includes(value)
-        ? prevFilters[name].filter(item => item !== value)
-        : [...prevFilters[name], value]
-    }));
-  };
+      [name]: currentFilter.includes(value)
+        ? currentFilter.filter(item => item !== value)
+        : [...currentFilter, value]
+    };
+  });
+};
+
+
+
 
   const formatFiltersForBackend = (filters) => {
     const formattedFilters = {};
@@ -83,7 +102,6 @@ const JobSearch = ({ onSearch }) => {
       datePosted: [],
       fieldOfExpertise: [],
       minExperience: [],
-      softSkills: [],
       techSkills: [],
       industry: [],
       scope: [],
@@ -111,10 +129,10 @@ const JobSearch = ({ onSearch }) => {
         </button>
       </div>
       <div className="filter-dropdowns">
-        <FilterDropDowns 
-          filters={filters} 
-          filterOptions={filterOptions} 
-          handleInputChange={handleInputChange} 
+        <FilterDropDowns
+          filters={filters}
+          filterOptions={filterOptions}
+          handleInputChange={handleInputChange}
         />
       </div>
     </div>

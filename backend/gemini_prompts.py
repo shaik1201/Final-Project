@@ -90,18 +90,175 @@ def retry_with_exponential_backoff(func, max_attempts=10, initial_delay=16, back
             delay *= backoff_factor
 
 
+# def edit_data(job_data, prompts_dict):
+#     # iterate over each job description and send it with the prompt to the model for creating new features
+#     for idx, job in enumerate(job_data):
+#         print(f"Processing job {idx + 1} / {len(job_data)}...")
+#         job_dict = {}
+#         for key, prompt in prompts_dict.items():
+#             while True:
+#                 def generate_content():
+#                     return model.generate_content(prompt + job['description'])
+#
+#                 response = retry_with_exponential_backoff(generate_content)
+#                 output_str = response.text
+#
+#                 # Use regular expressions to remove the markdown code block syntax in a case-insensitive manner
+#                 clean_output = re.sub(r'^```json\n', '', output_str, flags=re.IGNORECASE)
+#                 clean_output = re.sub(r'```$', '', clean_output, flags=re.IGNORECASE).strip()
+#
+#                 print(f"Clean Output: {clean_output}")
+#
+#                 # # Assuming the model's response is directly in JSON format in the response.text
+#                 output_dict = json.loads(clean_output)
+#                 if not output_dict:
+#                     break
+#
+#                 feature = list(output_dict.keys())[0]
+#                 value = output_dict[feature]
+#
+#                 if type(value) != str:
+#                     continue
+#
+#                 if key == "educationPrompt":
+#                     return_value = isValidEducation(value)
+#                     if return_value:
+#                         output_dict[feature] = return_value
+#                         break
+#
+#                 elif key == "fieldPrompt":
+#                     break
+#
+#                 elif key == "experiencePrompt" and isValidExperience(value):
+#                     break
+#
+#                 # elif key == "softSkillsPrompt":
+#                 #     break
+#
+#                 elif key == "technicalSkillsPrompt":
+#                     break
+#
+#                 elif key == "industryPrompt":
+#                     return_value = isValidIndustry(value)
+#                     if return_value:
+#                         output_dict[feature] = return_value
+#                         break
+#
+#                 elif key == "scopePositionPrompt":
+#                     return_value = isValidScopePosition(value)
+#                     if return_value:
+#                         output_dict[feature] = return_value
+#                         break
+#
+#                 elif key == "jobTypePrompt":
+#                     return_value = isValidJobType(value)
+#                     if return_value:
+#                         output_dict[feature] = return_value
+#                         break
+#
+#             job_dict.update(output_dict)
+#
+#         # Update the job dictionary with the new keys and values
+#         job.update(job_dict)
+#
+#     return job_data
+
+# def edit_data(job_data, prompts_dict):
+#     for idx, job in enumerate(job_data):
+#         print(f"Processing job {idx + 1} / {len(job_data)}...")
+#         job_dict = {}
+#         for key, prompt in prompts_dict.items():
+#             while True:
+#                 def generate_content():
+#                     return model.generate_content(prompt + job['description'])
+#
+#                 response = retry_with_exponential_backoff(generate_content)
+#                 output_str = response.text
+#
+#                 # Use regular expressions to remove the markdown code block syntax in a case-insensitive manner
+#                 clean_output = re.sub(r'^```json\n', '', output_str, flags=re.IGNORECASE)
+#                 clean_output = re.sub(r'```$', '', clean_output, flags=re.IGNORECASE).strip()
+#
+#                 print(f"Clean Output: {clean_output}")
+#
+#                 try:
+#                     # Assuming the model's response is directly in JSON format in the response.text
+#                     output_dict = json.loads(clean_output)
+#                 except json.JSONDecodeError as e:
+#                     print(f"Error decoding JSON: {e}")
+#                     continue
+#
+#                 if not output_dict:
+#                     break
+#
+#                 feature = list(output_dict.keys())[0]
+#                 value = output_dict[feature]
+#
+#                 if type(value) != str:
+#                     continue
+#
+#                 # Validate and decide to break the loop based on the feature key
+#                 # if key == "educationPrompt":
+#                 #     return_value = isValidEducation(value)
+#                 #     if return_value:
+#                 #         output_dict[feature] = return_value
+#                 #         break
+#
+#                 if key == "educationPrompt":
+#                     return_value = isValidEducation(value)
+#                     output_dict[feature] = return_value
+#                     break
+#
+#                 elif key == "fieldPrompt":
+#                     break
+#
+#                 elif key == "experiencePrompt" and isValidExperience(value):
+#                     break
+#
+#                 elif key == "technicalSkillsPrompt":
+#                     break
+#
+#                 elif key == "industryPrompt":
+#                     return_value = isValidIndustry(value)
+#                     output_dict[feature] = return_value
+#                     break
+#
+#                 elif key == "scopePositionPrompt":
+#                     return_value = isValidScopePosition(value)
+#                     output_dict[feature] = return_value
+#                     break
+#
+#                 elif key == "jobTypePrompt":
+#                     return_value = isValidJobType(value)
+#                     output_dict[feature] = return_value
+#                     break
+#
+#             job_dict.update(output_dict)
+#
+#         # Update the job dictionary with the new keys and values
+#         job.update(job_dict)
+#
+#     return job_data
+
 def edit_data(job_data, prompts_dict):
-    # iterate over each job description and send it with the prompt to the model for creating new features
     for idx, job in enumerate(job_data):
         print(f"Processing job {idx + 1} / {len(job_data)}...")
         job_dict = {}
+        skip_job = False  # Flag to skip the rest of the prompts for the current job
+
         for key, prompt in prompts_dict.items():
             while True:
                 def generate_content():
                     return model.generate_content(prompt + job['description'])
 
-                response = retry_with_exponential_backoff(generate_content)
-                output_str = response.text
+                try:
+                    response = retry_with_exponential_backoff(generate_content)
+                    output_str = response.text
+                except ValueError as e:
+                    print(f"Error for job {idx + 1} with prompt {key}: {e}")
+                    print("Skipping this job and continuing with the next one...")
+                    skip_job = True  # Set the flag to skip the rest of the prompts
+                    break  # Break the while loop
 
                 # Use regular expressions to remove the markdown code block syntax in a case-insensitive manner
                 clean_output = re.sub(r'^```json\n', '', output_str, flags=re.IGNORECASE)
@@ -109,8 +266,13 @@ def edit_data(job_data, prompts_dict):
 
                 print(f"Clean Output: {clean_output}")
 
-                # # Assuming the model's response is directly in JSON format in the response.text
-                output_dict = json.loads(clean_output)
+                try:
+                    # Assuming the model's response is directly in JSON format in the response.text
+                    output_dict = json.loads(clean_output)
+                except json.JSONDecodeError as e:
+                    print(f"Error decoding JSON: {e}")
+                    continue
+
                 if not output_dict:
                     break
 
@@ -120,11 +282,11 @@ def edit_data(job_data, prompts_dict):
                 if type(value) != str:
                     continue
 
+                # Validate and decide to break the loop based on the feature key
                 if key == "educationPrompt":
                     return_value = isValidEducation(value)
-                    if return_value:
-                        output_dict[feature] = return_value
-                        break
+                    output_dict[feature] = return_value
+                    break
 
                 elif key == "fieldPrompt":
                     break
@@ -132,37 +294,36 @@ def edit_data(job_data, prompts_dict):
                 elif key == "experiencePrompt" and isValidExperience(value):
                     break
 
-                # elif key == "softSkillsPrompt":
-                #     break
-
                 elif key == "technicalSkillsPrompt":
                     break
 
                 elif key == "industryPrompt":
                     return_value = isValidIndustry(value)
-                    if return_value:
-                        output_dict[feature] = return_value
-                        break
+                    output_dict[feature] = return_value
+                    break
 
                 elif key == "scopePositionPrompt":
                     return_value = isValidScopePosition(value)
-                    if return_value:
-                        output_dict[feature] = return_value
-                        break
+                    output_dict[feature] = return_value
+                    break
 
                 elif key == "jobTypePrompt":
                     return_value = isValidJobType(value)
-                    if return_value:
-                        output_dict[feature] = return_value
-                        break
+                    output_dict[feature] = return_value
+                    break
+
+            if skip_job:
+                break  # Break the for loop if an error occurred
 
             job_dict.update(output_dict)
+
+        if skip_job:
+            continue  # Skip to the next job if an error occurred
 
         # Update the job dictionary with the new keys and values
         job.update(job_dict)
 
     return job_data
-
 
 
 def isValidEducation(value):
@@ -182,7 +343,7 @@ def isValidEducation(value):
     }
 
     # List of valid education types
-    valid_education_types = ["BSc", "BA", "MSc", "MBA", "PhD", "Diploma", "Certificate", "Other"]
+    valid_education_types = ["BSc", "BA", "MSc", "MBA", "PhD", "Diploma", "Certificate", "High School", "High school diploma", "Other"]
 
     # Normalize the input by replacing variations with standard forms
     for key, standard in normalization_dict.items():
@@ -197,7 +358,7 @@ def isValidEducation(value):
     # Check if all items in the split list are valid education types
     for field in education_fields:
         if field not in valid_education_types:
-            return False
+            return 'Other'
 
     # Join the normalized fields back into a comma-separated string
     return ", ".join(education_fields)
@@ -237,7 +398,8 @@ def isValidIndustry(value):
         "legal",
         "professional services",
         "travel",
-        "other"
+        "other",
+        'food service'
     ]
 
     value = value.lower()
@@ -251,7 +413,7 @@ def isValidIndustry(value):
     # Check if all items in the split list are valid education types
     for field in industry_fields:
         if field not in valid_industry_types:
-            return False
+            return 'Other'
 
     # Join the normalized fields back into a comma-separated string
     industry_fields = ", ".join(industry_fields)
@@ -262,57 +424,117 @@ def isValidScopePosition(value):
     value = value.lower()
     if value in ["full-time", "part-time", "contract", "temporary", "freelance", "internship", "casual"]:
         return value.title()
-    return False
+    return 'Full-Time'
 
 
 def isValidJobType(value):
     value = value.lower()
     if value in ["in-office", "hybrid", "remote"]:
         return value.title()
-    return False
+    return 'In-Office'
 
 
 
 if __name__ == '__main__':
-    skill = 'Data Analyst'.strip()
-    num_jobs = 7
-    sort = 'date'
+    # skills = ["Software Engineer", "Data Scientist", "Data Engineer", "Data Analyst", "Business Intelligence (BI) Developer", "DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity Engineer", "Product Manager"]
+    #
+    # # skill = 'Data Analyst'.strip()
+    # num_jobs = 100
+    # sort = 'date'
+    #
+    # # Create the 'jobs' folder if it doesn't exist
+    # os.makedirs('jobs', exist_ok=True)
+    #
+    # # Scrape the jobs from Indeed
+    # scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs, sort)
+    # scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs, sort)
+    #
+    # # # Convert the scraped data to DataFrame
+    # # df_indeed = pd.DataFrame(scrapped_indeed_jobs_dict)
+    # # df_linkedin = pd.DataFrame(scrapped_linkedin_jobs_dict)
+    #
+    # # Save the DataFrames to CSV files in the 'jobs' folder
+    # # df_indeed.to_csv('jobs/Jobs_Indeed.csv', index=False)
+    # # df_linkedin.to_csv('jobs/Jobs_LinkedIn.csv', index=False)
+    #
+    # # Read the CSV files back into dictionaries
+    # # scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed.csv').to_dict('records')
+    # # scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn.csv').to_dict('records')
+    #
+    # # Edit the scrapped jobs data and add the new features
+    # indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
+    # linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
+    #
+    # # Convert the updated job data to DataFrames
+    # df_indeed_update = pd.DataFrame(indeed_jobs)
+    # df_linkedin_update = pd.DataFrame(linkedin_jobs)
+    #
+    # # Save the updated DataFrames to CSV files in the 'jobs' folder
+    # df_indeed_update.to_csv('jobs/Jobs_Indeed_update.csv', index=False)
+    # df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_update.csv', index=False)
+    #
+    # # Store the jobs into the database MongoDB
+    # for job in indeed_jobs:
+    #     Job.create_job(job)
+    #
+    # for job in linkedin_jobs:
+    #     Job.create_job(job)
+    # print("Jobs scraped successfully!")
 
-    # Create the 'jobs' folder if it doesn't exist
-    os.makedirs('jobs', exist_ok=True)
 
-    # Scrape the jobs from Indeed
-    scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs, sort)
-    scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs, sort)
-
-    # Convert the scraped data to DataFrame
-    df_indeed = pd.DataFrame(scrapped_indeed_jobs_dict)
-    df_linkedin = pd.DataFrame(scrapped_linkedin_jobs_dict)
-
-    # Save the DataFrames to CSV files in the 'jobs' folder
-    df_indeed.to_csv('jobs/Jobs_Indeed.csv', index=False)
-    df_linkedin.to_csv('jobs/Jobs_LinkedIn.csv', index=False)
+    # skills_indeed = ["Software Engineer", "Data Scientist", "Data Engineer", "Data Analyst", "Business Intelligence (BI) Developer"]
+    # skills_linkedin = ["DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity Engineer", "Product Manager"]
+    #
+    # num_jobs_per_skill = 10
+    # sort = 'date'
+    #
+    # # Create the 'jobs' folder if it doesn't exist
+    # os.makedirs('jobs', exist_ok=True)
+    #
+    # # Initialize empty lists to store job data
+    # indeed_jobs = []
+    # linkedin_jobs = []
+    #
+    # # Scrape jobs from Indeed for the first five skills
+    # for skill in skills_indeed:  # First five skills
+    #     scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs_per_skill, sort)
+    #     # Edit the scraped data and add new features
+    #     indeed_jobs.extend(scrapped_indeed_jobs_dict)
+    #
+    # # Scrape jobs from LinkedIn for the last five skills
+    # for skill in skills_linkedin:  # Last five skills
+    #     scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs_per_skill, sort)
+    #     # Edit the scraped data and add new features
+    #     linkedin_jobs.extend(scrapped_linkedin_jobs_dict)
+    #
+    # # indeed_jobs.extend(edit_data(indeed_jobs, prompts_dict))
+    # # linkedin_jobs.extend(edit_data(linkedin_jobs, prompts_dict))
+    #
+    # # Convert the updated job data to DataFrames
+    # df_indeed_update = pd.DataFrame(indeed_jobs)
+    # df_linkedin_update = pd.DataFrame(linkedin_jobs)
+    #
+    # # Save the updated DataFrames to CSV files in the 'jobs' folder
+    # df_indeed_update.to_csv('jobs/Jobs_Indeed_1.csv', index=False)
+    # df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_1.csv', index=False)
 
     # Read the CSV files back into dictionaries
-    scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed.csv').to_dict('records')
-    scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn.csv').to_dict('records')
+    # scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed_1.csv').to_dict('records')
+    scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn_1.csv').to_dict('records')
 
     # Edit the scrapped jobs data and add the new features
-    indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
-    linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
-
-    # Convert the updated job data to DataFrames
-    df_indeed_update = pd.DataFrame(indeed_jobs)
-    df_linkedin_update = pd.DataFrame(linkedin_jobs)
-
-    # Save the updated DataFrames to CSV files in the 'jobs' folder
-    df_indeed_update.to_csv('jobs/Jobs_Indeed_update.csv', index=False)
-    df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_update.csv', index=False)
-
+    # indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
+    # df_indeed_update = pd.DataFrame(indeed_jobs)
+    # df_indeed_update.to_csv('jobs/Jobs_Indeed_update_1.csv', index=False)
     # Store the jobs into the database MongoDB
-    for job in indeed_jobs:
-        Job.create_job(job)
+    # for job in indeed_jobs:
+    #     Job.create_job(job)
 
+    linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
+    df_linkedin_update = pd.DataFrame(linkedin_jobs)
+    df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_update_1.csv', index=False)
     for job in linkedin_jobs:
         Job.create_job(job)
     print("Jobs scraped successfully!")
+
+

@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from deep_translator import GoogleTranslator
 from langdetect import detect
 
+import os
 import re
 from datetime import datetime, timedelta
 
@@ -32,8 +33,16 @@ def get_indeed_jobs(skill, num_jobs, sort):
     total_jobs_scraped = 0
 
     # Initialize Chrome WebDriver
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
+    # service = Service(ChromeDriverManager().install())
+    # driver = webdriver.Chrome(service=service)
+
+    driver_path = ChromeDriverManager().install()
+    if "THIRD_PARTY_NOTICES" in driver_path:
+        # Correct the path to point to the actual ChromeDriver binary
+        driver_path = os.path.join(os.path.dirname(driver_path), "chromedriver")
+        os.chmod(driver_path, 0o755)  # Make it executable
+
+    driver = webdriver.Chrome(service=Service(driver_path))
 
     print(f'\nScraping in progress...\n')
     job_data = []
@@ -163,9 +172,17 @@ def get_linkedin_jobs(skill, num_jobs, sort):
     place = 'Israel'.strip()
     total_jobs_scraped = 0
 
-    # Initialize Chrome WebDriver
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
+    # # Initialize Chrome WebDriver
+    # service = Service(ChromeDriverManager().install())
+    # driver = webdriver.Chrome(service=service)
+
+    driver_path = ChromeDriverManager().install()
+    if "THIRD_PARTY_NOTICES" in driver_path:
+        # Correct the path to point to the actual ChromeDriver binary
+        driver_path = os.path.join(os.path.dirname(driver_path), "chromedriver")
+        os.chmod(driver_path, 0o755)  # Make it executable
+
+    driver = webdriver.Chrome(service=Service(driver_path))
 
     print('\nScraping in progress...\n')
     job_data = []
@@ -317,7 +334,7 @@ if __name__ == "__main__":
     num_jobs = 20
     sort = 'date'
 
-    jobs_indeed = get_indeed_jobs(skill, num_jobs)
+    jobs_indeed = get_indeed_jobs(skill, num_jobs, sort)
     jobs_linkedin = get_linkedin_jobs(skill, num_jobs, sort)
 
     print(f'\nScraping completed successfully!\n')
