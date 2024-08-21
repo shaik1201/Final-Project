@@ -8,6 +8,14 @@ const JobCard = ({ job }) => {
     setShowMore(!showMore);
   };
 
+  const getDaysAgo = (dateString) => {
+    const jobDate = new Date(dateString);
+    const today = new Date();
+    const timeDiff = today - jobDate;
+    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    return daysDiff === 1 ? '1 day ago' : `${daysDiff} days ago`;
+  };
+
   return (
     <div className="job-card">
       <div className="job-card-header">
@@ -16,7 +24,7 @@ const JobCard = ({ job }) => {
       </div>
       <div className={`job-card-body ${showMore ? 'expanded' : 'collapsed'}`}>
         <p className="job-location"><i className="fas fa-map-marker-alt"></i> {job.location}</p>
-        <p className="job-date"><i className="far fa-calendar-alt"></i> Posted: {job.date.slice(6)}</p>
+         <p className="job-date"><i className="far fa-calendar-alt"></i> Posted: {getDaysAgo(job.date)}</p>
         <div className="job-details">
           <p className="job-field_of_expertise"><span className="title">Field of expertise:</span> {job.field_of_expertise}</p>
           <p className="job-minimum_experience"><span className="title">Minimum experience:</span> {job.minimum_experience}</p>
