@@ -500,12 +500,13 @@ if __name__ == '__main__':
     # delete old jobs
     # Job.delete_old_jobs()
 
-    print("Deleting duplicate jobs based on job_id...")
-    Job.delete_duplicate_jobs()
+    # print("Deleting duplicate jobs based on job_id...")
+    # Job.delete_duplicate_jobs()
 
     # print("All Jobs in the Database:")
     # Job.print_all_jobs()
 
+    # Job.delete_jobs_by_title('Senior Director of Product Management, 2 Hour Learning (Remote) - $200,000/year USD')
 
 
 

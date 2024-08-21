@@ -217,6 +217,21 @@ class Job:
         print(f"Deleted {result.deleted_count} jobs with specified locations.")
 
 
+    @staticmethod
+    def delete_jobs_by_title(titles):
+        # Ensure titles is a list
+        if isinstance(titles, str):
+            titles = [titles]
+
+        # Build the query to match jobs with titles in the specified list
+        query = {"title": {"$in": titles}}
+
+        # Delete the matching jobs
+        result = db.jobs.delete_many(query)
+
+        print(f"Deleted {result.deleted_count} jobs with specified titles.")
+
+
 
 
 
