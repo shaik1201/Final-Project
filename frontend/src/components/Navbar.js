@@ -22,7 +22,7 @@ const Navbar = () => {
     <nav className={`navbar ${scrollPosition > 50 ? 'scrolled' : ''}`}>
       <div className="navbar-container">
         <NavLink to="/" className="navbar-logo">
-          LLM For Job Searching
+          AI For Job Searching
         </NavLink>
         <ul className="nav-menu">
           <li className="nav-item">

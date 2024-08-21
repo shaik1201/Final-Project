@@ -19,7 +19,7 @@ const formatTextWithNewLines = (text) => {
         <>
           {' '}
           <a href="https://tovtech.org/" target="_blank" rel="noopener noreferrer">
-            here
+           TovTech
           </a>
           .
         </>

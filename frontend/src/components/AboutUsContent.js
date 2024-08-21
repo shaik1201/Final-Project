@@ -4,13 +4,13 @@ const content = {
     aboutUs: {
       title: "About Us",
       text: `We are a group of six students from the Data Decision Science faculty at the Technion – Israel Institute of Technology.
-      Our project is a collaborative effort with TovTECH, and it represents the culmination of our final project for our Bachelor’s degree.`
+      Our project is a collaborative effort with TovTECH, and it represents our final project for our Bachelor’s degree.`
     },
     tovtech: {
       title: "About TovTECH",
-      text: `TovTECH is a technology company with a unique focus on data, automation, and AI, specializing in Hebrew language models.
-      They are committed to providing innovative technological solutions, while having a significant social impact.
-      Learn more about TovTECH `
+      text: `TovTECH is a technology company with a unique focus on data, automation, and AI, specializing in Hebrew language models
+      They are committed to providing innovative technological solutions, while having a significant social impact
+      Learn more about `
     },
     projectOverview: {
       title: "Project Overview",
