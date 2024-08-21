@@ -5,15 +5,15 @@ import FilterDropDowns from './FilterDropDowns.js';
 const JobSearch = ({ onSearch }) => {
   const [title, setTitle] = useState('');
   const [filters, setFilters] = useState({
-    company: [],
-    location: [],
-    datePosted: [],
-    fieldOfExpertise: [],
-    minExperience: [],
-    techSkills: [],
-    industry: [],
-    scope: [],
-    jobType: [],
+    company: '',
+    location: '',
+    datePosted: '',
+    fieldOfExpertise: '',
+    minExperience: '',
+    techSkills: '',
+    industry: '',
+    scope: '',
+    jobType: '',
   });
 
   const [filterOptions, setFilterOptions] = useState({
@@ -29,6 +29,7 @@ const JobSearch = ({ onSearch }) => {
   });
 
   const [isCleared, setIsCleared] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/filters`)
@@ -48,41 +49,18 @@ const JobSearch = ({ onSearch }) => {
     }
   }, [isCleared]);
 
-  // const handleInputChange = (name, value) => {
-  //   setFilters(prevFilters => ({
-  //     ...prevFilters,
-  //     [name]: prevFilters[name].includes(value)
-  //       ? prevFilters[name].filter(item => item !== value)
-  //       : [...prevFilters[name], value]
-  //   }));
-  // };
-
   const handleInputChange = (name, value) => {
-  setFilters(prevFilters => {
-    const currentFilter = prevFilters[name];
-
-    // Check if currentFilter is defined and is an array
-    if (!Array.isArray(currentFilter)) {
-      return prevFilters; // Return previous filters without updating to avoid errors
-    }
-
-    return {
+    setFilters(prevFilters => ({
       ...prevFilters,
-      [name]: currentFilter.includes(value)
-        ? currentFilter.filter(item => item !== value)
-        : [...currentFilter, value]
-    };
-  });
-};
-
-
-
+      [name]: value
+    }));
+  };
 
   const formatFiltersForBackend = (filters) => {
     const formattedFilters = {};
     for (const [key, value] of Object.entries(filters)) {
-      if (value.length > 0) {
-        formattedFilters[key] = value.join(',');
+      if (value) { // Check if value is not empty
+        formattedFilters[key] = value;
       }
     }
     return formattedFilters;
@@ -91,21 +69,22 @@ const JobSearch = ({ onSearch }) => {
   const handleSearch = () => {
     const formattedFilters = formatFiltersForBackend(filters);
     console.log('Performing search with:', { title, filters: formattedFilters });
-    onSearch({ title, filters: formattedFilters });
+    setCurrentPage(1); // Reset page to 1
+    onSearch({ title, filters: formattedFilters, page: 1 });
   };
 
   const handleClear = () => {
     setTitle('');
     setFilters({
-      company: [],
-      location: [],
-      datePosted: [],
-      fieldOfExpertise: [],
-      minExperience: [],
-      techSkills: [],
-      industry: [],
-      scope: [],
-      jobType: [],
+      company: '',
+      location: '',
+      datePosted: '',
+      fieldOfExpertise: '',
+      minExperience: '',
+      techSkills: '',
+      industry: '',
+      scope: '',
+      jobType: '',
     });
     setIsCleared(true);
   };

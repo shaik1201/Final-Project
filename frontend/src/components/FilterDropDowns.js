@@ -8,7 +8,7 @@ const Dropdown = ({ name, value, onChange, options, placeholder, title }) => (
       id={name}
       name={name}
       value={value}
-      onChange={e => onChange(name, e.target.value)} // Extract name and value before passing
+      onChange={e => onChange(name, e.target.value)}
       className="filter-dropdown"
     >
       <option value="" disabled>{placeholder}</option>
@@ -39,7 +39,7 @@ const FilterDropdowns = ({ filters, filterOptions, handleInputChange }) => {
           key={config.name}
           name={config.name}
           value={filters[config.name]}
-          onChange={handleInputChange} // handleInputChange will receive name and value
+          onChange={handleInputChange}
           options={filterOptions[config.name]}
           placeholder={"All"}
           title={config.title}

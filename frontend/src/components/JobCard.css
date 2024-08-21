@@ -126,6 +126,7 @@
   background-color: #005b92;
 }
 
+/* Add margin to the view job link to align it properly */
 .job-link {
   color: #0073b1;
   text-decoration: none;
@@ -133,6 +134,7 @@
   display: flex;
   align-items: center;
   transition: color 0.3s ease;
+  margin-top: 5px; /* Adjust this value as needed */
 }
 
 .job-link:hover {

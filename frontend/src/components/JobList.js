@@ -36,6 +36,7 @@ const JobList = () => {
 
   const handleSearch = (searchParams) => {
     setIsLoading(true);
+    setCurrentPage(1); // Reset to the first page on search
     fetch(`${process.env.REACT_APP_BACKEND_URL}/search`, {
       method: 'POST',
       headers: {
@@ -113,7 +114,7 @@ const JobList = () => {
   return (
     <div className="job-list">
         <Features />
-      
+
       <div className="container">
         <h1 className="main-title">Discover Your Next Career Move</h1>
         <div className="search-upload-wrapper">
