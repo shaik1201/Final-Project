@@ -1,19 +1,62 @@
-/* Styles for the dropdown container */
 .dropdown-container {
-  margin-bottom: 10px; /* Add space between dropdowns */
-  width: 150px;
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 200px;
 }
 
-/* Styles for the label */
-.dropdown-container label {
-  display: block;
-  margin-bottom: 0.5rem;
+.dropdown-button {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 8px;
+  width: 100%;
+  height: 75%;
+  text-align: left;
+  cursor: pointer;
+  color: black; /* Set the text color to black */
+  position: relative; /* To position the arrow icon */
+  transition: background-color 0.3s ease; /* Smooth transition for hover */
 }
 
-/* Styles for the dropdown select */
-.filter-dropdown {
-  width: 75%; /* Adjust the width as needed */
-  height: 40px; /* Adjust the height as needed */
-  padding: 0.540rem;
-  font-size: 1rem;
+.dropdown-button::after {
+  content: '\25BC'; /* Unicode character for down arrow */
+  font-size: 12px;
+  position: absolute;
+  right: 10px; /* Position the arrow on the right side */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.dropdown-button:hover {
+  background-color: #26355D; /* Change background color on hover */
+  color: white; /* Optionally change text color to white for better contrast */
+}
+
+.checkbox-dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  max-height: 200px; /* Adjust the max height for the dropdown */
+  overflow-y: auto;  /* Enable scrolling for the entire dropdown */
+  z-index: 100;
+  width: 100%;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.checkbox-option input {
+  margin-right: 10px;
+}
+
+.checkbox-option:hover {
+  background-color: #f0f0f0;
+}
+
+.filter-group {
+  margin-bottom: 20px;
 }

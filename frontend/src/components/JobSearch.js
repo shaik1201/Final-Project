@@ -5,15 +5,15 @@ import FilterDropDowns from './FilterDropDowns.js';
 const JobSearch = ({ onSearch }) => {
   const [title, setTitle] = useState('');
   const [filters, setFilters] = useState({
-    company: '',
-    location: '',
-    datePosted: '',
-    fieldOfExpertise: '',
-    minExperience: '',
-    techSkills: '',
-    industry: '',
-    scope: '',
-    jobType: '',
+    company: [],
+    location: [],
+    datePosted: [],
+    fieldOfExpertise: [],
+    minExperience: [],
+    techSkills: [],
+    industry: [],
+    scope: [],
+    jobType: [],
   });
 
   const [filterOptions, setFilterOptions] = useState({
@@ -30,6 +30,7 @@ const JobSearch = ({ onSearch }) => {
 
   const [isCleared, setIsCleared] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeDropdown, setActiveDropdown] = useState(null); // Track active dropdown
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/filters`)
@@ -59,7 +60,7 @@ const JobSearch = ({ onSearch }) => {
   const formatFiltersForBackend = (filters) => {
     const formattedFilters = {};
     for (const [key, value] of Object.entries(filters)) {
-      if (value) { // Check if value is not empty
+      if (value.length > 0) { // Check if value is not empty
         formattedFilters[key] = value;
       }
     }
@@ -70,30 +71,24 @@ const JobSearch = ({ onSearch }) => {
     const formattedFilters = formatFiltersForBackend(filters);
     console.log('Performing search with:', { title, filters: formattedFilters });
     setCurrentPage(1); // Reset page to 1
+    setActiveDropdown(null); // Close any open dropdowns
     onSearch({ title, filters: formattedFilters, page: 1 });
   };
 
   const handleClear = () => {
     setTitle('');
     setFilters({
-      company: '',
-      location: '',
-      datePosted: '',
-      fieldOfExpertise: '',
-      minExperience: '',
-      techSkills: '',
-      industry: '',
-      scope: '',
-      jobType: '',
+      company: [],
+      location: [],
+      datePosted: [],
+      fieldOfExpertise: [],
+      minExperience: [],
+      techSkills: [],
+      industry: [],
+      scope: [],
+      jobType: [],
     });
     setIsCleared(true);
-  };
-
-  // Handle keypress event to trigger search on "Enter"
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
   };
 
   return (
@@ -104,14 +99,12 @@ const JobSearch = ({ onSearch }) => {
           placeholder="Search by title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={handleKeyPress} // Added onKeyDown event listener
           className="search-input"
-          aria-label="Search by job title"
         />
-        <button onClick={handleSearch} className="search-button" aria-label="Search jobs">
+        <button onClick={handleSearch} className="search-button">
           <i className="fas fa-search"></i> Search
         </button>
-        <button onClick={handleClear} className="clear-button" aria-label="Clear search">
+        <button onClick={handleClear} className="clear-button">
           <i className="fas fa-times"></i> Clear
         </button>
       </div>
@@ -120,6 +113,8 @@ const JobSearch = ({ onSearch }) => {
           filters={filters}
           filterOptions={filterOptions}
           handleInputChange={handleInputChange}
+          activeDropdown={activeDropdown}
+          setActiveDropdown={setActiveDropdown} // Pass to manage active dropdowns
         />
       </div>
     </div>

@@ -1,4 +1,13 @@
-Flask
-pymongo
-flask_cors
-PyMuPDF
+deep_translator==1.11.4
+Flask==3.0.3
+Flask_Cors==4.0.1
+langdetect==1.0.9
+pandas==2.2.2
+protobuf==5.28.0
+pymongo==4.7.3
+selenium==4.24.0
+webdriver_manager==4.0.2
+PyMuPDF==1.24.8
+google-generativeai==0.7.2
+
+

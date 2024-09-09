@@ -23,9 +23,6 @@ try:
 except Exception as e:
     print(f"Failed to connect to MongoDB: {e}")
 
-# UPLOAD_FOLDER = 'uploads'  # Directory to save the uploaded files
-# if not os.path.exists(UPLOAD_FOLDER):
-#     os.makedirs(UPLOAD_FOLDER)
 
 @app.route('/upload_cv', methods=['POST'])
 def upload_cv():
@@ -111,27 +108,40 @@ def search_jobs():
 
     relevant_jobs = []
     for job in job_list:
-        if user_job_title and user_job_title not in job['title'].lower():
+        # Updated conditions to check for multiple values
+        if user_job_title and not any(title in job['title'].lower() for title in user_job_title):
             continue
-        if user_city and user_city not in job['location'].lower():
+
+        if user_company and not any(company in job['company'] for company in user_company):
             continue
-        if user_company and user_company not in job['company']:
+
+        if user_city and not any(city in job['location'].lower() for city in user_city):
             continue
-        if user_location and user_location not in job['location']:
+
+        if user_location and not any(location in job['location'] for location in user_location):
             continue
-        if user_field_of_expertise and user_field_of_expertise not in job['field_of_expertise']:
+
+        if user_field_of_expertise and not any(
+                expertise in job['field_of_expertise'] for expertise in user_field_of_expertise):
             continue
-        if user_min_experience and user_min_experience not in job['minimum_experience']:
+
+        if user_min_experience and not any(
+                experience in job['minimum_experience'] for experience in user_min_experience):
             continue
-        if user_soft_skills and user_soft_skills not in job['soft_skills']:
+
+        if user_soft_skills and not any(skill in job['soft_skills'] for skill in user_soft_skills):
             continue
-        if user_tech_skills and user_tech_skills not in job['technical_skills']:
+
+        if user_tech_skills and not any(tech_skill in job['technical_skills'] for tech_skill in user_tech_skills):
             continue
-        if user_industry and user_industry not in job['industry']:
+
+        if user_industry and not any(industry in job['industry'] for industry in user_industry):
             continue
-        if user_scope and user_scope not in job['scope_of_position']:
+
+        if user_scope and not any(scope in job['scope_of_position'] for scope in user_scope):
             continue
-        if user_job_type and user_job_type not in job['job_type']:
+
+        if user_job_type and not any(job_type in job['job_type'] for job_type in user_job_type):
             continue
 
         # Filter by date if a date threshold is set
