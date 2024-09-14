@@ -54,7 +54,9 @@ def get_indeed_jobs(skill, num_jobs, sort):
         else:
             url = f'https://il.indeed.com/jobs?q={skill}&l={place}&start={page}'
         driver.get(url)
-        time.sleep(5)  # Wait for dynamic content to load
+
+        # Wait for dynamic content to load
+        time.sleep(5)
 
         # Close any pop-ups if they appear
         close_popup(driver)
@@ -100,42 +102,7 @@ def get_indeed_jobs(skill, num_jobs, sort):
                 job_description = driver.find_element(By.ID, "jobDescriptionText").text if driver.find_element(By.ID, "jobDescriptionText") else "N/A"
 
                 # Translate the features to English
-                # job_title_language = detect(job_title)
-                # if job_title_language not in ['en']:
-                #     job_title = GoogleTranslator(source='iw', target='en').translate(job_title)
-
-
                 location, add_the_job = process_location(location, add_the_job)
-
-                # location_language = detect(location)
-                # if location_language in ['iw', 'he']:
-                #     location = GoogleTranslator(source='iw', target='en').translate(location)
-                #
-                # # Split the location string and filter out 'Israel', then join the parts back into a single string
-                # location = ', '.join(part.strip() for part in location.split(',') if 'israel' not in part.lower())
-                # location = location.split(',')
-                #
-                # # Fix the location for when only Tel Aviv District is provided
-                # if len(location) == 1 and location[0].lower() == 'tel aviv district':
-                #     location = ['Tel Aviv-Yafo', 'Tel Aviv District']
-                #
-                # # Fix the location for when only Tel Aviv District is provided
-                # if len(location) == 1 and location[0].lower() == 'central district':
-                #     add_the_job = False
-                #
-                # for i, part in enumerate(location):
-                #     if part.lower() == 'central district':
-                #         location[i] = 'Center District'
-                #
-                # for i, part in enumerate(location):
-                #     if part.lower() == 'Tel Aviv - Jaffa':
-                #         location[i] = 'Tel Aviv-Yafo'
-                #
-                # location = ', '.join(location)
-
-                # posted_language = detect(posted)
-                # if posted_language in ['en']:
-                #     posted = GoogleTranslator(source='iw', target='en').translate(posted)
 
                 job_description_language = detect(job_description)
                 if job_description_language in ['iw', 'he']:
@@ -246,10 +213,6 @@ def get_linkedin_jobs(skill, num_jobs, sort):
 
                 location, add_the_job = process_location(location, add_the_job)
 
-                # posted_language = detect(posted)
-                # if posted_language not in ['en']:
-                #     posted = GoogleTranslator(source='iw', target='en').translate(posted)
-
                 job_description_language = detect(job_description)
                 if job_description_language in ['iw', 'he']:
                     job_description = GoogleTranslator(source='iw', target='en').translate(job_description)
@@ -312,6 +275,7 @@ def process_location(location, add_the_job):
 
     add_the_job = True
     return location, add_the_job
+
 
 def convert_relative_date(relative_date):
     today = datetime.now()

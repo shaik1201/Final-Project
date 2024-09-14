@@ -1,20 +1,16 @@
-from copy import deepcopy
-import pandas as pd
 import google.generativeai as genai
 import google.api_core.exceptions
 import json
 import re
 import time
-import google.api_core.exceptions
 import config
-import os
-from jobs_scrapper import get_linkedin_jobs, get_indeed_jobs
-from models import Job
 
 
 genai.configure(api_key=config.GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
+
+# Prompt template for each feature that needs to be extracted
 prompt_template = """
 Given the following job description, please analyze and divide the content into distinct, relevant features and present the analysis in a structured format suitable for database entry. The expected format for each feature is a key-value pair, where the key is the feature name and the value is the detailed information extracted from the job description. Use the following keys for the feature:
 
@@ -34,6 +30,7 @@ IMPORTANT: Your response should always be in English, even if the job descriptio
 Job Description:
 """
 
+# Dictionary containing prompts for each feature extraction
 prompts_dict = {
     "educationPrompt": prompt_template.format(
         feature_key="Education",
@@ -71,6 +68,7 @@ prompts_dict = {
         example_output="Remote, Hybrid"
     )
 }
+
 
 def retry_with_exponential_backoff(func, max_attempts=10, initial_delay=16, backoff_factor=2):
     delay = initial_delay
@@ -277,81 +275,3 @@ def isValidJobType(value):
     if value in ["in-office", "hybrid", "remote"]:
         return value.title()
     return 'In-Office'
-
-
-
-if __name__ == '__main__':
-    # skills_indeed = ["Software Engineer", "Data Scientist", "Data Engineer", "Data Analyst", "Business Intelligence (BI) Developer"]
-    # skills_linkedin = ["DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity Engineer", "Product Manager"]
-    skills_indeed = ['Student', 'Part-Time']
-    num_jobs_per_skill = 10
-    sort = 'date'
-
-    # Create the 'jobs' folder if it doesn't exist
-    # os.makedirs('jobs', exist_ok=True)
-
-    # Initialize empty lists to store job data
-    # indeed_jobs = []
-    # linkedin_jobs = []
-    #
-    # # Scrape jobs from Indeed for the first five skills
-    # for skill in skills_indeed:  # First five skills
-    #     scrapped_indeed_jobs_dict = get_indeed_jobs(skill, num_jobs_per_skill, sort)
-    #     # Edit the scraped data and add new features
-    #     indeed_jobs.extend(scrapped_indeed_jobs_dict)
-
-    # # Scrape jobs from LinkedIn for the last five skills
-    # for skill in skills_linkedin:  # Last five skills
-    #     scrapped_linkedin_jobs_dict = get_linkedin_jobs(skill, num_jobs_per_skill, sort)
-    #     # Edit the scraped data and add new features
-    #     linkedin_jobs.extend(scrapped_linkedin_jobs_dict)
-    #
-    # indeed_jobs.extend(edit_data(indeed_jobs, prompts_dict))
-    # linkedin_jobs.extend(edit_data(linkedin_jobs, prompts_dict))
-    #
-    # # Convert the updated job data to DataFrames
-    # df_indeed_update = pd.DataFrame(indeed_jobs)
-    # df_linkedin_update = pd.DataFrame(linkedin_jobs)
-    #
-    # # Save the updated DataFrames to CSV files in the 'jobs' folder
-    # df_indeed_update.to_csv('jobs/Jobs_Indeed_New.csv', index=False)
-    # df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_1.csv', index=False)
-
-    # Read the CSV files back into dictionaries
-    # scrapped_indeed_jobs_dict = pd.read_csv('jobs/Jobs_Indeed_New.csv').to_dict('records')
-    # scrapped_linkedin_jobs_dict = pd.read_csv('jobs/Jobs_LinkedIn_1.csv').to_dict('records')
-
-    # Edit the scrapped jobs data and add the new features
-    # indeed_jobs = edit_data(scrapped_indeed_jobs_dict, prompts_dict)
-    # df_indeed_update = pd.DataFrame(indeed_jobs)
-    # df_indeed_update.to_csv('jobs/Jobs_Indeed_update_New.csv', index=False)
-    # Store the jobs into the database MongoDB
-    # for job in indeed_jobs:
-    #     Job.create_job(job)
-
-    # linkedin_jobs = edit_data(scrapped_linkedin_jobs_dict, prompts_dict)
-    # df_linkedin_update = pd.DataFrame(linkedin_jobs)
-    # df_linkedin_update.to_csv('jobs/Jobs_LinkedIn_update_1.csv', index=False)
-
-    # read Jobs_LinkedIn_update_1.csv
-    # df = pd.read_csv('jobs/Jobs_LinkedIn_update_1.csv')
-    # linkedin_jobs = df.to_dict('records')
-    # for job in linkedin_jobs:
-    #     Job.create_job(job)
-
-    # Job.clean_and_delete_jobs()
-    # print("Jobs scraped successfully!")
-
-    # delete old jobs
-    # Job.delete_old_jobs()
-
-    # print("Deleting duplicate jobs based on job_id...")
-    # Job.delete_duplicate_jobs()
-
-    # print("All Jobs in the Database:")
-    # Job.print_all_jobs()
-
-    # Job.delete_jobs_by_title('Senior Director of Product Management, 2 Hour Learning (Remote) - $200,000/year USD')
-
-
-

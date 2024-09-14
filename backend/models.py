@@ -106,7 +106,6 @@ class Job:
         for job in jobs:
             print(job)
 
-    import math
 
     @staticmethod
     def clean_and_delete_jobs():

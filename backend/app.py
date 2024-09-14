@@ -3,12 +3,9 @@ from models import Job
 from flask_cors import CORS
 from datetime import datetime, timedelta
 
-# from jobs_scrapper import get_indeed_jobs
 from pymongo import MongoClient
 import config
 import re
-# from deep_translator import GoogleTranslator
-import os
 from read_pdf import extract_text
 from gemini_for_CV import get_gemini_response
 import json
@@ -77,45 +74,43 @@ def get_jobs():
 def search_jobs():
     filters = request.get_json()
     user_job_title = filters.get('title', '').lower()
-    user_city = filters.get('city', '').lower()
-
-    # Collect filter values
     user_company = filters['filters'].get('company', '')
     user_location = filters['filters'].get('location', '')
-    user_date_posted = filters['filters'].get('datePosted', '')
+    user_date_posted = filters['filters'].get('datePosted', [])  # Expecting a list
     user_field_of_expertise = filters['filters'].get('fieldOfExpertise', '')
     user_min_experience = filters['filters'].get('minExperience', '')
-    user_soft_skills = filters['filters'].get('softSkills', '')
     user_tech_skills = filters['filters'].get('techSkills', '')
     user_industry = filters['filters'].get('industry', '')
     user_scope = filters['filters'].get('scope', '')
     user_job_type = filters['filters'].get('jobType', '')
 
-    # Determine the date threshold based on the selected option
+    # Get the current time
     now = datetime.now()
-    if user_date_posted == "Past 3 Days":
-        date_threshold = now - timedelta(days=4)
-    elif user_date_posted == "Past 7 Days":
-        date_threshold = now - timedelta(days=8)
-    elif user_date_posted == "Past 14 Days":
-        date_threshold = now - timedelta(days=15)
-    elif user_date_posted == "Past 1 Month":
-        date_threshold = now - timedelta(days=31)
-    else:
-        date_threshold = None
+
+    # Create a list to store all date thresholds based on user selection
+    date_thresholds = []
+
+    # Convert each date filter into a date threshold and store it in the list
+    for date_filter in user_date_posted:
+        if date_filter == "Past 3 Days":
+            date_thresholds.append(now - timedelta(days=3))
+        elif date_filter == "Past 7 Days":
+            date_thresholds.append(now - timedelta(days=7))
+        elif date_filter == "Past 14 Days":
+            date_thresholds.append(now - timedelta(days=14))
+        elif date_filter == "Past 1 Month":
+            date_thresholds.append(now - timedelta(days=30))
 
     job_list = Job.get_all_jobs()
 
     relevant_jobs = []
     for job in job_list:
-        # Updated conditions to check for multiple values
-        if user_job_title and not any(title in job['title'].lower() for title in user_job_title):
+        # if user_job_title and not any(title in job['title'].lower() for title in user_job_title):
+        #     continue
+        if user_job_title and user_job_title not in job['title'].lower():
             continue
 
         if user_company and not any(company in job['company'] for company in user_company):
-            continue
-
-        if user_city and not any(city in job['location'].lower() for city in user_city):
             continue
 
         if user_location and not any(location in job['location'] for location in user_location):
@@ -127,9 +122,6 @@ def search_jobs():
 
         if user_min_experience and not any(
                 experience in job['minimum_experience'] for experience in user_min_experience):
-            continue
-
-        if user_soft_skills and not any(skill in job['soft_skills'] for skill in user_soft_skills):
             continue
 
         if user_tech_skills and not any(tech_skill in job['technical_skills'] for tech_skill in user_tech_skills):
@@ -144,10 +136,11 @@ def search_jobs():
         if user_job_type and not any(job_type in job['job_type'] for job_type in user_job_type):
             continue
 
-        # Filter by date if a date threshold is set
-        if date_threshold:
+        # Filter by date if date thresholds are set
+        if date_thresholds:
             job_date = datetime.strptime(job['date'], '%Y-%m-%d')
-            if job_date < date_threshold:
+            # Check if the job date is within any of the date ranges
+            if not any(job_date >= threshold for threshold in date_thresholds):
                 continue
 
         relevant_jobs.append(job)
