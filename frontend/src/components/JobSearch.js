@@ -50,6 +50,22 @@ const JobSearch = ({ onSearch }) => {
     }
   }, [isCleared]);
 
+  // Add global keydown listener for Enter key
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        handleSearch();
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+
+    // Cleanup the event listener when component unmounts
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, [filters, title]); // Dependency array includes filters and title to ensure updated values are used
+
   const handleInputChange = (name, value) => {
     setFilters(prevFilters => ({
       ...prevFilters,
