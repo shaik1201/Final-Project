@@ -1,8 +1,23 @@
 import React from 'react';
 import './FilterDropDowns.css';
 
-const CheckboxDropdown = ({ name, selectedValues, onChange, options, title, activeDropdown, setActiveDropdown }) => {
+// Utility function to truncate text with ellipsis
+const truncateText = (text, maxLength) => {
+  if (text.length > maxLength) {
+    return text.slice(0, maxLength) + '...';
+  }
+  return text;
+};
+
+const CheckboxDropdown = ({ name, selectedValues, onChange, options, activeDropdown, setActiveDropdown, title }) => {
   const isOpen = activeDropdown === name;
+
+  // Check if all options are selected
+  const areAllSelected = options.length > 0 && selectedValues.length === options.length;
+
+  const selectedText = areAllSelected
+    ? `${title}: Select All`
+    : truncateText(selectedValues.join(', '), 20); // Adjust maxLength as needed
 
   const handleCheckboxChange = (value) => {
     if (selectedValues.includes(value)) {
@@ -12,21 +27,35 @@ const CheckboxDropdown = ({ name, selectedValues, onChange, options, title, acti
     }
   };
 
-  const toggleDropdown = () => {
-    if (isOpen) {
-      setActiveDropdown(null); // Close if it's already open
+  const handleSelectAll = () => {
+    if (areAllSelected) {
+      // If all options are selected, deselect all
+      onChange(name, []);
     } else {
-      setActiveDropdown(name); // Open the clicked dropdown and close others
+      // Otherwise, select all options
+      onChange(name, [...options]);
     }
+  };
+
+  const toggleDropdown = () => {
+    setActiveDropdown(isOpen ? null : name); // Toggle dropdown
   };
 
   return (
     <div className="dropdown-container">
       <button className="dropdown-button" onClick={toggleDropdown}>
-        {title}
+        {selectedValues.length > 0 ? selectedText : title} {/* Show "Select All" or selected values */}
       </button>
       {isOpen && (
         <div className="checkbox-dropdown scrollable-dropdown">
+          <label className="checkbox-option">
+            <input
+              type="checkbox"
+              checked={areAllSelected}
+              onChange={handleSelectAll}
+            />
+            Select All
+          </label>
           {options.map(option => (
             <label key={option} className="checkbox-option">
               <input
@@ -45,15 +74,15 @@ const CheckboxDropdown = ({ name, selectedValues, onChange, options, title, acti
 
 const FilterDropdowns = ({ filters, filterOptions, handleInputChange, activeDropdown, setActiveDropdown }) => {
   const dropdownConfigs = [
-    { name: "company", title: "Company" },
-    { name: "location", title: "Location" },
-    { name: "datePosted", title: "Date posted" },
-    { name: "fieldOfExpertise", title: "Field of expertise" },
-    { name: "minExperience", title: "Minimum experience" },
-    { name: "techSkills", title: "Technical skills" },
-    { name: "industry", title: "Industry" },
-    { name: "scope", title: "Scope of position" },
-    { name: "jobType", title: "Job type" }
+    { name: 'company', title: 'Company' },
+    { name: 'location', title: 'Location' },
+    { name: 'datePosted', title: 'Date posted' },
+    { name: 'fieldOfExpertise', title: 'Field of expertise' },
+    { name: 'minExperience', title: 'Minimum experience' },
+    { name: 'techSkills', title: 'Technical skills' },
+    { name: 'industry', title: 'Industry' },
+    { name: 'scope', title: 'Scope of position' },
+    { name: 'jobType', title: 'Job type' },
   ];
 
   return (
@@ -67,7 +96,7 @@ const FilterDropdowns = ({ filters, filterOptions, handleInputChange, activeDrop
           options={filterOptions[config.name]}
           title={config.title}
           activeDropdown={activeDropdown}
-          setActiveDropdown={setActiveDropdown} // Manage active dropdowns
+          setActiveDropdown={setActiveDropdown}
         />
       ))}
     </>
