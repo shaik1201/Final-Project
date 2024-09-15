@@ -14,7 +14,7 @@ const UploadCV = ({ onUpload, onFileChange, message }) => {
 
   return (
     <div className="upload-container">
-      <h2>Upload your CV and let us do the rest 🏖️</h2>
+      <h2>Upload your CV and let us do the rest 📄</h2>
       <label htmlFor="file-upload" className="custom-file-upload">
         <i className="fas fa-upload"></i> Choose File
       </label>
