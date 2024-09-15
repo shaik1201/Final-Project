@@ -34,37 +34,36 @@ def upload_cv():
         text = extract_text(file)
         if text:
             # print(text)
-            features = json.loads(get_gemini_response(text))
+            features = get_gemini_response(text)
             if 'error' in features:
                 return jsonify({"error": features['error']}), 402
 
-            print(features)
-            # education = features['Education']
-            years_of_experience = features['years_of_experience']
-            soft_skills = features['soft_skills']
-            technical_skills = features['technical_skills']
             field_of_expertise = features['field_of_expertise']
+            years_of_experience = features['years_of_experience']
+            technical_skills = features['technical_skills']
             is_student = features['is_student']
+
             job_list = Job.get_all_jobs()
             relevant_jobs = []
             for job in job_list:
-                # if education and not isValidEducation(education, job['minimum_education']):
-                #     continue
+                if field_of_expertise:
+                    field_of_expertise_lower = [f.lower() for f in field_of_expertise]
+                    job_field_of_expertise_lower = [item.strip().lower() for item in job['field_of_expertise'].split(',')]
+                    if not any(f in field_of_expertise_lower for f in job_field_of_expertise_lower):
+                        continue
                 if years_of_experience and int(years_of_experience) < int(job['minimum_experience'][0]):
                     continue
-                # if soft_skills and not any(skill in job['soft_skills'] for skill in soft_skills):
-                #     continue
-                # if technical_skills and not any(skill in job['technical_skills'] for skill in technical_skills):
-                #     continue
-                # if field_of_expertise and field_of_expertise not in job['field_of_expertise']:
-                #     continue
-                if (is_student == False and job['scope_of_position'] == 'Part-time')\
-                    or (is_student == True and job['scope_of_position'] == 'Full-time'):
+                if technical_skills:
+                    tech_skills_lower = [t.lower() for t in technical_skills]
+                    job_tech_skills_lower = [item.strip().lower() for item in job['technical_skills'].split(',')]
+                    if not any(t in tech_skills_lower for t in job_tech_skills_lower):
+                        continue
+                if is_student is True and job['scope_of_position'] == 'Full-time':
                     continue
+
                 relevant_jobs.append(job)
             return jsonify(relevant_jobs)
-            
-            
+
         return jsonify({"message": "File uploaded successfully"}), 200
 
     return jsonify({"error": "File upload failed"}), 500
@@ -230,6 +229,3 @@ def get_unique_filter_values():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
