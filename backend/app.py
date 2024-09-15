@@ -33,7 +33,6 @@ def upload_cv():
     if file:
         text = extract_text(file)
         if text:
-            # print(text)
             features = get_gemini_response(text)
             if 'error' in features:
                 return jsonify({"error": features['error']}), 402

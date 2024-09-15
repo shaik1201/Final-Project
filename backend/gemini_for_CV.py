@@ -4,6 +4,7 @@ import google.generativeai as genai
 import json
 import re
 
+
 def get_gemini_response(text, max_retries=5, delay=2):
     for attempt in range(max_retries):
         GOOGLE_API_KEY = config.GOOGLE_API_KEY
@@ -58,8 +59,8 @@ def is_valid_json(data):
     except json.JSONDecodeError:
         return False
 
+
 def isValidStudent(value):
-    # Check if the value is "yes" or "no"
     if value in [False, True]:
         return True
     return False
