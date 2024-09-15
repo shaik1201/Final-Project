@@ -10,6 +10,7 @@ const JobList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [cvFile, setCvFile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [message, setMessage] = useState(''); // State for managing messages
   const jobsPerPage = 9;
 
   useEffect(() => {
@@ -87,23 +88,32 @@ const JobList = () => {
           body: formData,
         });
 
-        if (!response.ok) {
-          throw new Error(`Error uploading CV: ${response.statusText}`);
-        }
-
         const result = await response.json();
-        if (Array.isArray(result)) {
-          setJobs(result);
-        } else {
-          console.error('Uploaded CV response is not an array:', result);
+
+        if (response.status === 400) {
+          setMessage(result.error);
+        } else if (response.status === 401){
+          setMessage(result.error);
+        } else if (response.status === 402){
+          setMessage(result.error);
+        } else if (response.status === 500) {
+          setMessage('An internal server error occurred while uploading your CV.');
+        } else if (response.ok) {
+          if (Array.isArray(result)) {
+            setJobs(result);
+            setMessage('CV uploaded successfully. Relevant jobs found!');
+          } else {
+            console.error('Uploaded CV response is not an array:', result);
+          }
         }
       } catch (error) {
         console.error('Error uploading CV:', error);
+        setMessage('An error occurred while uploading your CV. Please try again.');
       } finally {
         setIsLoading(false);
       }
     } else {
-      alert('Please select a file to upload.');
+      setMessage('Please select a file to upload.');
     }
   };
 
@@ -113,12 +123,12 @@ const JobList = () => {
 
   return (
     <div className="job-list">
-        <Features />
+      <Features />
 
       <div className="container">
         <h1 className="main-title">Discover Your Next Career Move</h1>
         <div className="search-upload-wrapper">
-          <UploadCV onUpload={uploadCV} onFileChange={handleFileChange} />
+          <UploadCV onUpload={uploadCV} onFileChange={handleFileChange} message={message} />
           <div className="divider">
             <span>or</span>
           </div>

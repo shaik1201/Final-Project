@@ -21,6 +21,11 @@ def get_gemini_response(text, max_retries=5, delay=2):
                 "field_of_expertise": "Data Science",
                 "is_student": false
             }}
+            
+            If the uploaded file is not a CV, return the following error message:
+            {{
+                "error": "The uploaded file is not a CV."
+            }}
         '''
         model_output = model.generate_content(prompt).text
         model_output_json = model_output.replace("'", '"')

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './UploadCV.css';
 
-const UploadCV = ({ onUpload, onFileChange }) => {
+const UploadCV = ({ onUpload, onFileChange, message }) => {
   const [fileName, setFileName] = useState('');
 
   const handleFileChange = (e) => {
@@ -23,8 +23,10 @@ const UploadCV = ({ onUpload, onFileChange }) => {
       <button onClick={onUpload} className="upload-button">
         <i className="fas fa-cloud-upload-alt"></i> Upload CV
       </button>
+      {/* Display the message below the button */}
+      {message && <p className="upload-message">{message}</p>}
     </div>
   );
-}
+};
 
 export default UploadCV;

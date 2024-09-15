@@ -28,14 +28,18 @@ def upload_cv():
 
     file = request.files['cv']
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+        return jsonify({"error": "No selected file"}), 401
 
     if file:
         text = extract_text(file)
         if text:
             # print(text)
             features = json.loads(get_gemini_response(text))
+            if 'error' in features:
+                return jsonify({"error": features['error']}), 402
+
             print(features)
+            # education = features['Education']
             years_of_experience = features['years_of_experience']
             soft_skills = features['soft_skills']
             technical_skills = features['technical_skills']
@@ -44,6 +48,8 @@ def upload_cv():
             job_list = Job.get_all_jobs()
             relevant_jobs = []
             for job in job_list:
+                # if education and not isValidEducation(education, job['minimum_education']):
+                #     continue
                 if years_of_experience and int(years_of_experience) < int(job['minimum_experience'][0]):
                     continue
                 # if soft_skills and not any(skill in job['soft_skills'] for skill in soft_skills):
